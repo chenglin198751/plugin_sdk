@@ -7,12 +7,6 @@
 | 手机 | 18618148241 | 所在地 | 北京 | 毕业于 | 郑州大学 |
 | 时间 | 2007.09-2010.07 | 邮箱 | chenglin198751@qq.com | 职业 | Android开发专家 |
 
-- 自己维护多年的快速开发框架地址：[chenglin198751/BaseMyProject](https://github.com/chenglin198751/BaseMyProject)
-- 附上在360集团title截图：
-  ![title截图](https://qd.shouji.qihucdn.com/media/5c1a9c1a43db65facf4959736d083147/6a8fbddc66dda.png)
-- 附上历年绩效截图zip：https://qd.shouji.qihucdn.com/media/717ba0061f2ca47a9af8e0e313c0692b/6a8fc5827b861.zip
-- 附上荣誉证书照片zip：https://qd.shouji.qihucdn.com/media/5a00c01376cede99d9d4acd45c92284f/6a8fc627158d1.zip
-
 ## 工作经历
 
 | 公司              | 职位 | 时间 |
@@ -79,3 +73,10 @@
 - 鸿蒙手游 SDK
 - 坦克世界助手 / 战舰世界助手（安卓和鸿蒙）
 - Android 快速开发框架
+
+## 其他
+- 自己维护多年的快速开发框架地址：[chenglin198751/BaseMyProject](https://github.com/chenglin198751/BaseMyProject)
+- 附上在360集团title截图：
+  ![title截图](https://qd.shouji.qihucdn.com/media/5c1a9c1a43db65facf4959736d083147/6a8fbddc66dda.png)
+- 附上历年绩效截图zip：https://qd.shouji.qihucdn.com/media/717ba0061f2ca47a9af8e0e313c0692b/6a8fc5827b861.zip
+- 附上荣誉证书照片zip：https://qd.shouji.qihucdn.com/media/5a00c01376cede99d9d4acd45c92284f/6a8fc627158d1.zip
