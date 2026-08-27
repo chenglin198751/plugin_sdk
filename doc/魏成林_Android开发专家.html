@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>魏成林 - 个人简历</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --primary: #2b6cb0;
+    --primary-dark: #1a4a7a;
+    --text: #2d3748;
+    --text-light: #718096;
+    --border: #e2e8f0;
+    --bg: #f5f7fa;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .resume {
+    max-width: 920px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    padding: 56px 64px 64px;
+  }
+
+  /* 头部 */
+  .header {
+    text-align: center;
+    padding-bottom: 28px;
+    margin-bottom: 32px;
+    border-bottom: 3px solid var(--primary);
+  }
+  .header .name {
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: var(--text);
+  }
+  .header .title {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--primary);
+    letter-spacing: 2px;
+  }
+
+  /* 章节 */
+  section { margin-bottom: 36px; }
+  section:last-child { margin-bottom: 0; }
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 18px;
+  }
+  h2::before {
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 20px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+
+  /* 个人信息网格 */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px 32px;
+    margin-bottom: 18px;
+  }
+  .info-item { font-size: 15px; }
+  .info-item .label {
+    font-weight: 600;
+    color: var(--text-light);
+    margin-right: 10px;
+  }
+  .info-item .value { color: var(--text); }
+
+  /* 附件列表 */
+  .attach-list {
+    list-style: none;
+    font-size: 15px;
+    color: var(--text);
+  }
+  .attach-list li {
+    margin-bottom: 10px;
+    padding-left: 18px;
+    position: relative;
+  }
+  .attach-list li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 11px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+  }
+  .attach-list a {
+    color: var(--primary);
+    text-decoration: none;
+    word-break: break-all;
+  }
+  .attach-list a:hover { text-decoration: underline; }
+  .attach-list img {
+    display: block;
+    max-width: 100%;
+    margin-top: 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  /* 表格 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f0f4f8;
+    font-weight: 600;
+    color: var(--primary-dark);
+  }
+
+  /* 技能树 / 自我描述 列表 */
+  ol.skill-list, ol.desc-list { padding-left: 26px; }
+  ol.skill-list li, ol.desc-list li {
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
+  ol.skill-list li:last-child, ol.desc-list li:last-child { margin-bottom: 0; }
+  .skill-list a, .desc-list a {
+    color: var(--primary);
+    text-decoration: none;
+    word-break: break-all;
+  }
+  .skill-list a:hover, .desc-list a:hover { text-decoration: underline; }
+  ol.skill-list li.featured {
+    color: #4a90d9;
+  }
+
+  /* 项目经验 */
+  ul.project-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 0;
+  }
+  ul.project-list li {
+    width: 33.33%;
+    font-size: 15px;
+    padding-left: 18px;
+    position: relative;
+  }
+  ul.project-list li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 11px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+  }
+
+  @media print {
+    body { background: #fff; }
+    .resume { box-shadow: none; margin: 0; max-width: none; padding: 24px 0; }
+    section { page-break-inside: avoid; }
+  }
+
+  @media (max-width: 640px) {
+    .resume { padding: 28px 20px; }
+    .info-grid { grid-template-columns: 1fr 1fr; }
+    ul.project-list li { width: 50%; }
+  }
+</style>
+</head>
+<body>
+<div class="resume">
+
+  <div class="header">
+    <div class="name">魏成林</div>
+    <div class="title">Android开发专家</div>
+  </div>
+
+  <section>
+    <h2>个人信息</h2>
+    <div class="info-grid">
+      <div class="info-item"><span class="label">姓名</span><span class="value">魏成林</span></div>
+      <div class="info-item"><span class="label">性别</span><span class="value">男</span></div>
+      <div class="info-item"><span class="label">出生年月</span><span class="value">1987-05-11</span></div>
+      <div class="info-item"><span class="label">民族</span><span class="value">汉族</span></div>
+      <div class="info-item"><span class="label">籍贯</span><span class="value">河南</span></div>
+      <div class="info-item"><span class="label">专业</span><span class="value">计算机软件技术</span></div>
+      <div class="info-item"><span class="label">手机</span><span class="value">18618148241</span></div>
+      <div class="info-item"><span class="label">所在地</span><span class="value">北京</span></div>
+      <div class="info-item"><span class="label">毕业于</span><span class="value">郑州大学</span></div>
+      <div class="info-item"><span class="label">时间</span><span class="value">2007.09-2010.07</span></div>
+      <div class="info-item"><span class="label">邮箱</span><span class="value">chenglin198751@qq.com</span></div>
+      <div class="info-item"><span class="label">职业</span><span class="value">Android开发专家</span></div>
+    </div>
+    <ul class="attach-list">
+      <li>自己维护多年的快速开发框架地址：<a href="https://github.com/chenglin198751/BaseMyProject">chenglin198751/BaseMyProject</a></li>
+      <li>附上在360集团title截图：
+        <img src="https://qd.shouji.qihucdn.com/media/5c1a9c1a43db65facf4959736d083147/6a8fbddc66dda.png" alt="title截图">
+      </li>
+      <li>附上历年绩效截图zip：<a href="https://qd.shouji.qihucdn.com/media/717ba0061f2ca47a9af8e0e313c0692b/6a8fc5827b861.zip">https://qd.shouji.qihucdn.com/media/717ba0061f2ca47a9af8e0e313c0692b/6a8fc5827b861.zip</a></li>
+      <li>附上荣誉证书照片zip：<a href="https://qd.shouji.qihucdn.com/media/5a00c01376cede99d9d4acd45c92284f/6a8fc627158d1.zip">https://qd.shouji.qihucdn.com/media/5a00c01376cede99d9d4acd45c92284f/6a8fc627158d1.zip</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>工作经历</h2>
+    <table>
+      <thead>
+        <tr><th>公司</th><th>职位</th><th>时间</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>北京360集团</td><td>Android开发专家</td><td>2018.03 - 至今</td></tr>
+        <tr><td>北京美丽说（后与蘑菇街合并）</td><td>Android资深工程师</td><td>2015.03 - 2018.03</td></tr>
+        <tr><td>北京百合网</td><td>Android中级工程师</td><td>2013.06 - 2015.03</td></tr>
+        <tr><td>北京安全管家（后并入腾讯管家）</td><td>Android开发工程师</td><td>2011.02 - 2013.06</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>技能树</h2>
+    <ol class="skill-list">
+      <li class="featured">熟练使用 Claude Code 100% 完成工作，从手搓代码时代顺利过渡到 100% Claude Code 时代，熟练自定义各种skills，工作效率提升10倍-20倍</li>
+      <li class="featured">熟练掌握原生鸿蒙APP开发，可以从0到1开发出上架到鸿蒙商店的app（360坦克营地助手和战舰世界助手鸿蒙版就是我开发的）</li>
+      <li class="featured">极其熟练掌握 Android app开发，用自己维护多年的快速开发框架，可以很快的从0到1完成app</li>
+      <li class="featured">极其熟悉 APK 逆向分析、Smali 修改及 APK 重打包，能徒手修改 smali 源码，再汇编为apk（以前手搓smali，现在AI改smali如明文般）</li>
+      <li class="featured">极为擅长各种逆向，比如反编译三方apk插入广告，反编译三方jar修改源码再重打包jar</li>
+      <li class="featured">极为擅长国内安卓手游SDK平台聚合打包，游戏只需出母包apk，就可以一键实现接入国内所有游戏SDK，比如小米，vivo，oppo，华为等（渠道手游SDK聚合打包这项工作我在360干了7.5年，自己做了很多技术创新，申请了十来个专利，在此技术领域超过我的屈指可数），所有聚合打包技术问题我都有极为成熟的解决方案，比如可以把1G APK 打包时间从单个20分钟缩短到3分钟。附上在公司内部晋升时PPT，我所有的聚合打包技术积累都汇聚于此（一定要看看）：<a href="https://qd.shouji.qihucdn.com/media/e567a2d6dd105c18b02705ed56851b90/6a8fb5c878869.zip">https://qd.shouji.qihucdn.com/media/e567a2d6dd105c18b02705ed56851b90/6a8fb5c878869.zip</a></li>
+      <li class="featured">极为擅长开发国内手游官网SDK，360渠道手游SDK我开发维护了7.5年，日常身兼技术客服对接CP，QQ技术客服账号《360SDK-包打听》就是我，手游SDK所有的坑我都踩过，经验极为丰富</li>
+      <li>擅长用java写各种工具，比如360渠道官方SDK自检工具，360渠道CP上传时的apk校验工具，等等</li>
+      <li>擅长复杂项目AI重构。比如360手机助手和手机卫士，原来是360 RePlugin 插件化框架，一个主程包含30个插件apk，开发维护极为困难。我用Claude code 去插件化，不分白天黑夜让CC自动执行，平均3天就能搞定一个插件代码合并到主程</li>
+      <li>擅长使用AI工作流开发，MCP连接 figma 让AI 画出UI页面，再根据prd规划出具体技术实现方案.md ，配合自定义skills，全程AI工作流开发</li>
+      <li>AI编程的精髓就是面向文档编程，怕AI写的代码自己看不懂？只需要对每个功能模块让AI严格按照其逻辑写出具体的md文档，每次开发基于此md文档进行，并且每次修改再回写此md，万无一失，做到AI写代码AI改</li>
+      <li>比较熟悉国内各个平台广告SDK，比如穿山甲、广点通优量汇、百青藤 等，维护过360自用聚合广告聚合SDK</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>自我描述</h2>
+    <ol class="desc-list">
+      <li>性格开朗乐观，喜欢聊天，和同事相处关系融洽，信奉“友好沟通能解决一切问题”原则</li>
+      <li>喜欢写代码，现在进入AI时代更是深深爱上了纯AI编程，仿佛自己化身神明，指挥Claude Code，言出法随，指哪打哪</li>
+      <li>喜欢并擅长AI重构老项目，既锻炼了自己使用AI的技能，又让老项目枯木逢春，焕发新生</li>
+      <li>学习新技术快，因为我喜欢总结和记笔记。善于学习是一种能力，一旦掌握了学习能力，触类旁通，学什么都快。</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>做过的项目</h2>
+    <ul class="project-list">
+      <li>《安全管家》</li>
+      <li>《安管优化》</li>
+      <li>《百合网客户端》</li>
+      <li>《百合网结婚》</li>
+      <li>《百合网婚庆》</li>
+      <li>《百合网婚博会特卖》</li>
+      <li>《百合网婚礼相册》</li>
+      <li>《美丽说》</li>
+      <li>《美丽说美喵》</li>
+      <li>《蘑菇街》</li>
+      <li>《360手机小游戏》</li>
+      <li>《360游戏大厅》</li>
+      <li>《360游戏大厅模拟器Launcher》</li>
+      <li>《360联运手游SDK》</li>
+      <li>《坦克世界助手》（安卓和鸿蒙）</li>
+      <li>《战舰世界助手》（安卓和鸿蒙）</li>
+      <li>《鸿蒙手游SDK》</li>
+      <li>《360聚合打包SDK》</li>
+      <li>《360手机卫士》</li>
+      <li>《360手机管家》</li>
+      <li>《360快剪辑》</li>
+      <li>《360内部聚合广告SDK》</li>
+      <li>《小猫快玩》</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>项目经验（简易版）</h2>
+    <ul class="project-list">
+      <li>360 聚合打包 SDK</li>
+      <li>360 联运手游 SDK</li>
+      <li>360 手机助手 / 手机卫士</li>
+      <li>AI 重构大型 Android 项目</li>
+      <li>鸿蒙手游 SDK</li>
+      <li>坦克世界助手 / 战舰世界助手（安卓和鸿蒙）</li>
+      <li>Android 快速开发框架</li>
+    </ul>
+  </section>
+
+</div>
+</body>
+</html>
