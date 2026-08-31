@@ -158,6 +158,30 @@
   }
   .skill-list a:hover, .desc-list a:hover { text-decoration: underline; }
 
+  /* 重点项目介绍 */
+  ol.key-project-list { padding-left: 26px; }
+  ol.key-project-list > li {
+    margin-bottom: 12px;
+    font-size: 15px;
+  }
+  ol.key-project-list > li:last-child { margin-bottom: 0; }
+  ol.key-project-list ul {
+    list-style: disc;
+    padding-left: 22px;
+    margin-top: 6px;
+  }
+  ol.key-project-list ul li {
+    margin-bottom: 6px;
+    font-size: 15px;
+  }
+  ol.key-project-list ul li:last-child { margin-bottom: 0; }
+  .key-project-list a {
+    color: var(--primary);
+    text-decoration: none;
+    word-break: break-all;
+  }
+  .key-project-list a:hover { text-decoration: underline; }
+
   /* 项目经验 */
   ul.project-list {
     list-style: none;
@@ -185,6 +209,10 @@
   @media print {
     body { background: #fff; }
     .resume { box-shadow: none; margin: 0; max-width: none; padding: 24px 0; }
+    * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
   }
 
   @media (max-width: 640px) {
@@ -213,7 +241,7 @@
       <div class="info-item"><span class="label">专业</span><span class="value">计算机软件技术</span></div>
       <div class="info-item"><span class="label">手机</span><span class="value">18618148241</span></div>
       <div class="info-item"><span class="label">所在地</span><span class="value">北京</span></div>
-      <div class="info-item"><span class="label">毕业于</span><span class="value">郑州大学</span></div>
+      <div class="info-item"><span class="label">毕业于</span><span class="value">郑州大学工学院</span></div>
       <div class="info-item"><span class="label">时间</span><span class="value">2007.09-2010.07</span></div>
       <div class="info-item"><span class="label">邮箱</span><span class="value">chenglin198751@qq.com</span></div>
       <div class="info-item"><span class="label">职业</span><span class="value">Android开发专家</span></div>
@@ -228,7 +256,7 @@
       </thead>
       <tbody>
         <tr><td>北京360集团</td><td>Android开发专家</td><td>2018.03 - 至今</td></tr>
-        <tr><td>北京融数金服（丰年微商）</td><td>Android资深工程师</td><td>2017.03 - 2018.03</td></tr>
+        <tr><td>北京融数金服（丰年微商）</td><td>Android架构师</td><td>2017.03 - 2018.03</td></tr>
         <tr><td>北京美丽说（后与蘑菇街合并为美丽联合集团）</td><td>Android资深工程师</td><td>2015.03 - 2017.03</td></tr>
         <tr><td>北京百合网</td><td>Android中级工程师</td><td>2013.06 - 2015.03</td></tr>
         <tr><td>北京安全管家（后并入腾讯管家）</td><td>Android开发工程师</td><td>2011.02 - 2013.06</td></tr>
@@ -265,7 +293,7 @@
   </section>
 
   <section>
-    <h2>做过的项目</h2>
+    <h2>开发过的项目</h2>
     <ul class="project-list">
       <li>《安全管家》</li>
       <li>《安管优化》</li>
@@ -277,7 +305,7 @@
       <li>《美丽说》</li>
       <li>《美丽说美喵》</li>
       <li>《蘑菇街》</li>
-      <li>《360手机小游戏》</li>
+      <li>《360 H5 小游戏SDK》</li>
       <li>《360游戏大厅》</li>
       <li>《360游戏大厅模拟器Launcher》</li>
       <li>《360联运手游SDK》</li>
@@ -286,7 +314,7 @@
       <li>《鸿蒙手游SDK》</li>
       <li>《360聚合打包SDK》</li>
       <li>《360手机卫士》</li>
-      <li>《360手机管家》</li>
+      <li>《360手机助手》</li>
       <li>《360快剪辑》</li>
       <li>《360内部聚合广告SDK》</li>
       <li>《小猫快玩》</li>
@@ -294,16 +322,28 @@
   </section>
 
   <section>
-    <h2>项目经验（简易版）</h2>
-    <ul class="project-list">
-      <li>360 聚合打包 SDK</li>
-      <li>360 联运手游 SDK</li>
-      <li>360 手机助手 / 手机卫士</li>
-      <li>AI 重构大型 Android 项目</li>
-      <li>鸿蒙手游 SDK</li>
-      <li>坦克世界助手 / 战舰世界助手（安卓和鸿蒙）</li>
-      <li>Android 快速开发框架</li>
-    </ul>
+    <h2>重点项目介绍</h2>
+    <ol class="key-project-list">
+      <li><strong>《360聚合打包SDK》：</strong> 开发+维护 7.5 年，是 Android 多渠道游戏 SDK 聚合平台，面向 360 独家代理游戏发行体系，将各渠道 SDK（360联运、oppo/vivo/小米/华为/荣耀、bilibili、UC、大臣 等 40+ 渠道）归一到统一「聚合SDK」，使 CP 一次接入即可全渠道发包。
+        <ul>
+          <li>整合友盟/厂商推送、微信、引力引擎及 8 家广告插件等三方 SDK，按渠道差异化开关接入打包平台，规避厂商审核风险。</li>
+          <li>主导 Python 自动化多渠道打包工具：apktool 反编译母包 → 按渠道注入 SDK/插件/运行参数 → smali 层改写 + aapt2 重生成 R 资源 → 回编译 → zipalign + v1/v2/v3 三重签名，支持多包名批量产出、并发打包与按 jar md5 的增量缓存，一个命令完成全渠道出包。</li>
+          <li>重构渠道接入方式：由「手动拆解 AAR 再合并」改为 Android Studio 编译直接产出 dex，打包时直接 merge；并通过切 dex（split_dex）解决多三方 SDK 合并后的方法数超限（65535）问题。</li>
+          <li>打包时直接复用渠道 SDK 编译产物 dex、跳过解包/合并步骤，打包速度提升约 3 倍。</li>
+          <li>修复 R 文件 ID 在重新打包后错乱问题：针对重编译后三方 AAR 资源 id 错乱的问题，实现 smali 字节码层面的 R 资源 id 自动重映射——单次遍历反编译目录树收集三方 `R$*.smali` 与主包 R 建立 id 映射，逐行替换并做一致性校验；针对 `declare-styleable` 中 attr 引用同步改写（如 ConstraintLayout 控件错位），并用「映射预构建 + 单次正则批量替换」优化，避免逐行全量 replace 的性能开销。</li>
+        </ul>
+      </li>
+      <li><strong>《360官方联运手游SDK》：</strong> 开发+维护 7.5 年，面向 360 游戏中心第三方 CP 的官方联运 SDK，提供登录、支付、社交、游戏支持等一站式能力。
+        <ul>
+          <li>采用插件化架构：CP 侧仅集成轻量 sdk_in 宿主库，主体 UI 与业务逻辑封装在独立插件 APK（登录/支付/悬浮球/礼包/加速等）中，运行时由 ApkPluggingManager 动态加载，实现 SDK 不发版即可热更新。</li>
+          <li>配套交付 CP 自检工具（apkchecker.jar）、本地打包脚本与完整发版流程。</li>
+        </ul>
+      </li>
+      <li><strong>《坦克世界助手》《战舰世界助手》：</strong> 坦克世界和战舰世界这俩大型PC游戏的官方app，从0到1实现安卓版和鸿蒙版</li>
+      <li><strong>《鸿蒙手游SDK》：</strong> 360独代游戏上线鸿蒙渠道使用的SDK，从0到1开发实现</li>
+      <li><strong>《360手机卫士》《360手机助手》：</strong> 日常开发+维护 1 年有余。主导 AI 去插件化重构：原为 360 RePlugin 插件化框架，一个主程承载约 30 个插件 APK，开发维护成本极高；使用 Claude Code 将各插件代码自动化合并回主程，平均 3 天合并一个插件，显著降低工程复杂度与维护成本</li>
+      <li><strong>《Android 快速开发框架（BaseMyProject）》：</strong> 自己维护多年的开源快速开发框架，可快速从 0 到 1 完成 App 开发。GitHub：<a href="https://github.com/chenglin198751/BaseMyProject">chenglin198751/BaseMyProject</a></li>
+    </ol>
   </section>
 
   <section>
