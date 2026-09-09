@@ -32,7 +32,7 @@
 2. 极其熟练掌握 Android APP开发，用自己维护多年的快速开发框架，可以快速从0到1完成APP开发和上架
 3. 擅长APP性能优化，解决各种ANR、优化大型APP启动速度等。启动优化方面，既会把 Application、Launcher Activity 等启动关键类尽可能集中到第一个 dex（primary dex），也会利用 Google Play 的 Baseline Profile，主动指定启动关键类和方法，引导 ART 提前编译优化启动路径
 4. 极为擅长各种逆向，反编译三方APK插入广告、反编译三方jar修改源码再重打包jar、多个APK无源码合并
-5. 极为擅长国内安卓手游SDK平台聚合打包，游戏只需出母包APK，就可以一键实现接入国内所有游戏SDK，比如小米，vivo，oppo，华为等（渠道手游SDK聚合打包这项工作我在360干了7.5年，自己做了很多技术创新，申请了十来个专利，在此技术领域超过我的屈指可数），所有聚合打包技术问题我都有极为成熟的解决方案，比如可以把1G APK 打包时间从单个20分钟缩短到3分钟。附上在公司内部晋升时PPT，我所有的聚合打包技术积累都汇聚于此（一定要看看）：https://qd.shouji.qihucdn.com/media/e567a2d6dd105c18b02705ed56851b90/6a8fb5c878869.zip
+5. 极为擅长国内安卓手游SDK平台聚合打包，游戏只需出母包APK，就可以一键实现接入国内所有游戏SDK，比如小米，vivo，oppo，华为等（渠道手游SDK聚合打包这项工作我在360干了7.5年，自己做了很多技术创新，申请了十来个专利，在此技术领域超过我的屈指可数），所有聚合打包技术问题我都有极为成熟的解决方案，比如可以把1G APK 打包时间从单个20分钟缩短到3分钟。附上在公司内部晋升时PPT，我所有的聚合打包技术积累都汇聚于此：https://qd.shouji.qihucdn.com/media/e567a2d6dd105c18b02705ed56851b90/6a8fb5c878869.zip
 6. 熟练掌握原生鸿蒙APP开发，可以从0到1开发出上架到鸿蒙商店的APP（360坦克世界助手和战舰世界助手鸿蒙版就是我开发的）
 7. 极其熟悉 APK 逆向分析、smali 修改及 APK 重打包，能徒手修改 smali 源码，再汇编为APK（以前手搓smali，现在AI改smali如明文般）
 8. 极为擅长开发国内手游官网SDK，360渠道手游SDK我开发维护了7.5年，日常身兼技术客服对接CP，QQ技术客服账号《360SDK-包打听》就是我，手游SDK所有的坑我都踩过，经验极为丰富
@@ -87,7 +87,11 @@
 3. **《坦克世界助手》《战舰世界助手》：** 坦克世界和战舰世界这俩大型PC游戏的官方APP，从0到1实现安卓版和鸿蒙版
 4. **《鸿蒙手游SDK》：** 360独代游戏上线鸿蒙渠道使用的SDK，从0到1开发实现
 5. **《360手机卫士》《360手机助手》：** 日常开发+维护 1 年有余。主导 AI 去插件化重构：原为 360 RePlugin 插件化框架，一个主程承载约 30 个插件 APK，开发维护成本极高；使用 Claude Code 将各插件代码自动化合并回主程，平均 3 天合并一个插件，显著降低工程复杂度与维护成本
-6. **《Android 快速开发框架（BaseMyProject）》：** 自己维护多年的开源快速开发框架，可快速从 0 到 1 完成 APP 开发。GitHub：[chenglin198751/BaseMyProject](https://github.com/chenglin198751/BaseMyProject)
+6. **《360手游海外SDK》：** 开发+维护 5 年，面向出海游戏的海外发行 SDK，提供登录、支付、广告、分享、推送等一站式能力，采用插件化架构。
+   - 登录：整合 Google / Facebook / Twitter / Line（日本）/ Kakao、Naver（韩国）等三方登录，支持游客账号、扫码登录、账号绑定与注销。
+   - 支付：接入 Google Play、OneStore（韩国）、Samsung Galaxy Store、MyCard 信用卡等海外渠道，支持订阅与历史订单补发。
+   - 广告：聚合 AdMob、IronSource、AppLovin MAX（含 Mintegral）激励视频，适配 GDPR 隐私合规。
+7. **《Android 快速开发框架（BaseMyProject）》：** 自己维护多年的开源快速开发框架，可快速从 0 到 1 完成 APP 开发。GitHub：[chenglin198751/BaseMyProject](https://github.com/chenglin198751/BaseMyProject)
 
 ## 其他
 - 自己维护多年的快速开发框架地址：[chenglin198751/BaseMyProject](https://github.com/chenglin198751/BaseMyProject)
