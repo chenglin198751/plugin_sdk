@@ -19,7 +19,7 @@
 
 ## AI Coding 技能树
 
-1. 擅长AI跨端开发，一人能搞定 Android、iOS、鸿蒙
+1. 擅长AI原生跨端开发，一端开发，多端复刻。通常以Android为主版本，先完成完整的原生实现，再让AI基于Android代码 1:1 复刻到 iOS 和鸿蒙，三端均采用原生技术栈，不依赖 Flutter、React Native 等跨端框架
 2. 熟练使用 Claude Code 100% AI Coding，从手搓代码时代顺利过渡到 100% AI Coding 时代，工作效率提升3倍-20倍，并熟练自定义各种skills
 3. 擅长复杂项目AI重构。比如360《手机助手》和《手机卫士》，原来是 RePlugin 插件化框架，一个主程包含30多个插件APK，开发维护极为困难。我用Claude Code自定义skills去插件化，不分白天黑夜让 CC loop执行，平均3天就能搞定一个插件代码合并到主程
 4. 擅长使用AI工作流开发，MCP连接 Figma 让AI画出UI页面，再根据PRD规划出具体技术实现方案.md（规划完成必须和产品确认），配合自定义skills和md对照表（知识图谱），做到全程AI工作流开发
