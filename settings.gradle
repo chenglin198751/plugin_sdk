@@ -15,5 +15,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "PureTestDemo"
+rootProject.name = "PluginSdk"
 include ':app'

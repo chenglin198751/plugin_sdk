@@ -3,12 +3,12 @@ plugins {
 }
 
 android {
-    namespace 'com.example.test22'
+    namespace 'com.plugin.sdk'
     compileSdk 33
     buildToolsVersion '33.0.0'
 
     defaultConfig {
-        applicationId "com.example.test22"
+        applicationId "com.plugin.sdk"
         minSdk 21
         targetSdk 33
         versionCode 1
