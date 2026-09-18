@@ -9,6 +9,7 @@ import android.view.MotionEvent;
 import android.view.WindowManager.LayoutParams;
 
 import com.plugin.sdk.utils.AppLogUtils;
+import com.plugin.sdk.utils.EdgeToEdge;
 
 /**
  * 宿主占位 Activity（对齐 360 的 HostProxyActivity）。
@@ -26,6 +27,8 @@ public class HostProxyActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+
         try {
             mActivityProxy = new ApkPluggingActivityProxy();
             mActivityProxy.init();

@@ -62,6 +62,7 @@ public final class PluginSdk {
      * <p>
      * 实际启动的是宿主的占位 Activity {@link HostProxyActivity}，由它把生命周期
      * 转发给插件里的 ApkProxyActivity（对齐 360 插件方案）。
+     * 占位 Activity 默认开启 edge-to-edge 全屏。
      */
     public static void startPluginActivity(Context context) {
         HotUpdateEngine engine = HotUpdateEngine.get();
