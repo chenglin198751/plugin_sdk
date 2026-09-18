@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="demo_title">Demo App（PluginSdk 接入方）</string>
+    <string name="btn_import_patch">从 sdcard 导入补丁</string>
+    <string name="btn_load_patch_view">加载补丁 View（dex+资源）</string>
+    <string name="btn_start_patch_activity">启动补丁 Activity</string>
+</resources>
