@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 补丁里的"图片"资源：用一个 vector 模拟本地图，验证本地图资源热更新 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="72dp"
+    android:height="72dp"
+    android:viewportWidth="72"
+    android:viewportHeight="72">
+    <path
+        android:fillColor="#FF3D5AFE"
+        android:pathData="M36,4 L66,36 L36,68 L6,36 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M36,16 L52,36 L36,56 L20,36 Z" />
+</vector>

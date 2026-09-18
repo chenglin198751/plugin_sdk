@@ -14,3 +14,8 @@ local.properties
 ~$V2ChannelTools说明.xlsx
 ~$V2ChannelTool技术架构.xlsx
 ~$CDN 测试 CASE.xlsx
+
+# 各模块构建产物
+/plugin/build/
+/sdk/build/
+/demo/build/

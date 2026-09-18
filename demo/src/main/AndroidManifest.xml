@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  宿主（母体）AndroidManifest。
+  插件资源用 packageId 0x80 隔离，宿主（接入方）可以自由使用 0x7f 资源，两者不会冲突。
+  当前 demo 为求极简仍用系统 theme、无 icon/label；真实接入方 App 可正常带资源。
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:name="com.plugin.sdk.demo.HostApplication"
+        android:theme="@android:style/Theme.Material.NoActionBar">
+
+        <!-- 宿主入口（空壳，仅用于启动/加载插件） -->
+        <activity
+            android:name="com.plugin.sdk.demo.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 预注册插件 Activity：类由插件 dex 提供，此处仅占位声明组件名 -->
+        <activity
+            android:name="com.plugin.sdk.plugin.PluginActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Material.NoActionBar" />
+
+    </application>
+
+</manifest>

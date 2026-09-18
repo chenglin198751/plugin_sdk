@@ -16,4 +16,5 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "PluginSdk"
-include ':app'
+include ':sdk'
+include ':demo'
