@@ -1,39 +1,107 @@
 package com.plugin.sdk.plugin;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.WindowManager.LayoutParams;
 import android.widget.TextView;
 
 /**
- * 补丁里的完整 Activity。
+ * 插件里的「Activity」（对齐 360 的插件 Activity 写法）。
  * <p>
- * 由宿主通过 manifest 预注册的类名启动（宿主 dex 里并没有这个类，
- * 补丁 dex 合并进宿主 ClassLoader 后即可被加载）。
- * <p>
- * 资源采用「补丁自举」方式：不依赖宿主全局 Resources，而是从 Intent 里
- * 拿到补丁 APK 路径，用 {@link PluginResources} 加载补丁自身资源 inflate 布局。
+ * 不是真正的 android.app.Activity，而是继承 {@link PluginBaseActivity}、实现
+ * {@link ApkInterfaceForProxyActivity} 的普通类。生命周期由宿主的占位 Activity
+ * 转发进来，本类在 onCreate 里用插件资源 inflate 布局并 set 到宿主 Activity 上。
  */
-public class PluginActivity extends Activity {
+public class PluginActivity extends PluginBaseActivity implements ApkInterfaceForProxyActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-//        EdgeToEdge.enable(this);
-        super.onCreate(savedInstanceState);
+    public void onCreate(Activity activity, Bundle savedInstanceState) {
+        setContentView(activity, R.layout.plugin_activity);
 
-        String patchPath = getIntent().getStringExtra("patch_path");
-        if (patchPath == null) {
-            // 兜底：宿主可能没传，尝试用宿主 classloader 的 dex 信息解析（骨架阶段忽略）
-            finish();
-            return;
-        }
-
-        View view = PluginResources.inflate(this, patchPath, R.layout.plugin_activity);
-        setContentView(view);
-
-        TextView version = findViewById(R.id.tv_plugin_version);
+        TextView version = (TextView) findViewById(R.id.tv_plugin_version);
         if (version != null) {
             version.setText("补丁版本 " + PluginEntry.getVersion());
         }
+    }
+
+    @Override
+    public void onStart() {
+    }
+
+    @Override
+    public void onRestart() {
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    }
+
+    @Override
+    public void onResume() {
+    }
+
+    @Override
+    public void onPause() {
+    }
+
+    @Override
+    public void onStop() {
+    }
+
+    @Override
+    public void onDestroy() {
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return false;
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        return false;
+    }
+
+    @Override
+    public void onWindowAttributesChanged(LayoutParams params) {
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+    }
+
+    @Override
+    public void onBackPressed() {
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.finish();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return false;
     }
 }

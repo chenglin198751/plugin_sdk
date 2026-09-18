@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.plugin.sdk.PluginSdk;
+import com.plugin.sdk.utils.AppLogUtils;
 
 import java.lang.reflect.Method;
 
@@ -29,7 +30,6 @@ import java.lang.reflect.Method;
  */
 public class MainActivity extends Activity {
 
-    private static final String PLUGIN_ACTIVITY = "com.plugin.sdk.plugin.PluginActivity";
     private static final String PLUGIN_ENTRY = "com.plugin.sdk.plugin.PluginEntry";
 
     private TextView statusText;
@@ -132,14 +132,16 @@ public class MainActivity extends Activity {
             patchContainer.removeAllViews();
             patchContainer.addView(view);
         } catch (Throwable t) {
+            AppLogUtils.e("MainActivity", "加载补丁 View 失败", t);
             Toast.makeText(this, "加载补丁 View 失败: " + t, Toast.LENGTH_LONG).show();
         }
     }
 
     private void startPatchActivity() {
         try {
-            PluginSdk.startPluginActivity(this, PLUGIN_ACTIVITY);
+            PluginSdk.startPluginActivity(this);
         } catch (Throwable t) {
+            AppLogUtils.e("MainActivity", "启动补丁 Activity 失败", t);
             Toast.makeText(this, "启动补丁 Activity 失败: " + t, Toast.LENGTH_LONG).show();
         }
     }

@@ -40,9 +40,13 @@ public final class ResourceLoader {
         AssetManager am = AssetManager.class.newInstance();
         Method addAssetPath = AssetManager.class.getDeclaredMethod("addAssetPath", String.class);
         addAssetPath.setAccessible(true);
-        // 必须同时加入宿主 APK，否则宿主自己的资源会丢失
+        // 宿主（0x7f）用 addAssetPath，否则宿主自己的资源会丢失
         addAssetPath.invoke(am, context.getApplicationInfo().sourceDir);
-        addAssetPath.invoke(am, patchApkPath);
+        // 补丁（0x80，共享库区间）必须用 addAssetPathAsSharedLibrary
+        Method addSharedLibrary = AssetManager.class.getDeclaredMethod(
+                "addAssetPathAsSharedLibrary", String.class);
+        addSharedLibrary.setAccessible(true);
+        addSharedLibrary.invoke(am, patchApkPath);
         return am;
     }
 

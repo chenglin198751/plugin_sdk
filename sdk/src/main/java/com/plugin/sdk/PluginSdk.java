@@ -4,8 +4,10 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 
+import com.plugin.sdk.activity.HostProxyActivity;
 import com.plugin.sdk.hotupdate.HotUpdateEngine;
 import com.plugin.sdk.hotupdate.PatchRepository;
+import com.plugin.sdk.utils.AppLogUtils;
 
 import java.io.IOException;
 
@@ -57,17 +59,19 @@ public final class PluginSdk {
 
     /**
      * 启动插件 Activity。
-     *
-     * @param activityClassName 插件 Activity 全限定名，需已在接入方 manifest 预注册。
+     * <p>
+     * 实际启动的是宿主的占位 Activity {@link HostProxyActivity}，由它把生命周期
+     * 转发给插件里的 ApkProxyActivity（对齐 360 插件方案）。
      */
-    public static void startPluginActivity(Context context, String activityClassName) {
+    public static void startPluginActivity(Context context) {
         HotUpdateEngine engine = HotUpdateEngine.get();
         if (engine == null || !engine.isPatchLoaded()) {
             throw new IllegalStateException("补丁未加载，无法启动插件 Activity");
         }
-        Intent intent = new Intent();
-        intent.setClassName(context, activityClassName);
+        Intent intent = new Intent(context, HostProxyActivity.class);
         intent.putExtra("patch_path", engine.getPatchPath());
+        intent.putExtra("plugin_view_id", 1);
+        AppLogUtils.i("PluginSdk", "启动插件 Activity: HostProxyActivity, 补丁路径=" + engine.getPatchPath());
         context.startActivity(intent);
     }
 }

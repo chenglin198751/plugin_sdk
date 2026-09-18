@@ -1,0 +1,59 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.plugin.sdk.plugin'
+    compileSdk 37
+
+    defaultConfig {
+        applicationId "com.plugin.sdk.plugin"
+        minSdk 21
+        targetSdk 37
+        versionCode 1
+        versionName "2.0.0"
+    }
+
+    signingConfigs {
+        release {
+            // 复用 debug 签名（与宿主一致），验签「补丁签名 == 宿主签名」才能通过。
+            storeFile file(System.getProperty("user.home") + "/.android/debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+}
+
+// 编译完成后，把插件 APK 自动复制到 demo 的 assets（demo 打包时自动带上插件）
+project.afterEvaluate {
+    assembleRelease.doLast {
+        copyPatchApkToDemo()
+    }
+}
+
+def copyPatchApkToDemo() {
+    def output = "${project.buildDir}/outputs/apk/release/plugin-release.apk"
+    def destDir = "${rootDir}/demo/src/main/assets/"
+    copy {
+        from output
+        into destDir
+        rename { "patch.apk" }
+    }
+}

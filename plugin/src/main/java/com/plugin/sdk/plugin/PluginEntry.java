@@ -1,7 +1,6 @@
 package com.plugin.sdk.plugin;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 
 /**
@@ -10,8 +9,8 @@ import android.view.View;
  * 宿主通过反射加载补丁 dex 后，反射调用本类的静态方法。
  * 本类只依赖 android.jar，不依赖任何宿主类，保证补丁可以独立编译。
  * <p>
- * R 常量由 aapt2 以 --package-id 0x80 生成，与宿主（0x7f）天然隔离，
- * 因此即使接入方 App 有大量 0x7f 资源，也不会与插件资源冲突。
+ * 补丁资源用 aapt2 --shared-lib 编译，R 常量是 0x00 占位，需在加载资源后
+ * 调用 {@code R.onResourcesLoaded(packageId)} 才会变成真实 id。
  */
 public final class PluginEntry {
 
@@ -26,9 +25,17 @@ public final class PluginEntry {
     }
 
     /**
+     * 初始化补丁资源：加载补丁 APK 资源并填充 R 常量。
+     * 宿主在加载补丁 dex 后调用一次（幂等）。
+     */
+    public static void initResources(Context context, String patchPath) {
+        PluginResources.init(context, patchPath);
+    }
+
+    /**
      * 宿主直接拿一个补丁里的 View 嵌入显示（演示「dex + 资源」整条链路）。
      */
     public static View createView(Context context) {
-        return LayoutInflater.from(context).inflate(R.layout.plugin_activity, null);
+        return PluginResources.inflate(context, R.layout.plugin_activity);
     }
 }

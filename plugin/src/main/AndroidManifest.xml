@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   插件模块的 AndroidManifest（由 AGP 编译，namespace 在 plugin/build.gradle 中声明）。
-  插件的 Activity 由宿主通过 manifest 预注册的同名类名启动，插件 APK 本身不独立安装。
+  插件里没有真正的 Activity（都是 PluginBaseActivity 普通类，通过宿主 HostProxyActivity
+  代理启动），因此这里无需声明任何组件。
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.plugin.sdk.plugin">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application>
-        <activity
-            android:name="com.plugin.sdk.plugin.PluginActivity"
-            android:exported="false" />
-    </application>
+    <application />
 
 </manifest>

@@ -80,9 +80,9 @@ public final class HotUpdateEngine {
             DexLoader.load(appContext, path);
             AppLogUtils.i(TAG, "dex 加载成功");
 
-            // 3. 加载资源
-            ResourceLoader.load(appContext, path);
-            AppLogUtils.i(TAG, "资源加载成功");
+            // 3. 初始化补丁资源（--shared-lib 需要调用 R.onResourcesLoaded）
+            initPluginResources(path);
+            AppLogUtils.i(TAG, "补丁资源初始化成功");
 
             patchLoaded = true;
             patchVersion = readPatchVersion();
@@ -93,6 +93,13 @@ public final class HotUpdateEngine {
             lastError = "加载失败: " + t;
             AppLogUtils.e(TAG, "加载补丁异常", t);
         }
+    }
+
+    /** 初始化补丁资源（反射调用补丁的 PluginEntry.initResources，内部会 R.onResourcesLoaded）。 */
+    private void initPluginResources(String path) throws Exception {
+        Class<?> entry = Class.forName("com.plugin.sdk.plugin.PluginEntry");
+        Method m = entry.getMethod("initResources", Context.class, String.class);
+        m.invoke(null, appContext, path);
     }
 
     /** 补丁 dex 加载后，反射读取补丁版本号。 */

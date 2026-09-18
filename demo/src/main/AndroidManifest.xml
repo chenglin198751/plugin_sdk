@@ -20,9 +20,9 @@
             </intent-filter>
         </activity>
 
-        <!-- 预注册插件 Activity：类由插件 dex 提供，此处仅占位声明组件名 -->
+        <!-- 宿主占位 Activity：承载插件里的「Activity」，生命周期转发给插件 -->
         <activity
-            android:name="com.plugin.sdk.plugin.PluginActivity"
+            android:name="com.plugin.sdk.activity.HostProxyActivity"
             android:exported="false"
             android:theme="@android:style/Theme.Material.NoActionBar" />
 
