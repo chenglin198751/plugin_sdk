@@ -71,11 +71,13 @@ public final class EdgeToEdge {
         }
         View decorView = window.getDecorView();
         Resources resources = decorView.getResources();
-        boolean statusBarIsDark = statusBarStyle.detectDarkMode(resources);
-        boolean navigationBarIsDark = navigationBarStyle.detectDarkMode(resources);
 
         int sdk = Build.VERSION.SDK_INT;
         try {
+            // detectDarkMode 可能来自接入方自定义的 DarkModeDetector，放在 try 内，
+            // 避免它抛异常时把异常带到 Activity.onCreate 上，把全屏适配变成启动崩溃源。
+            boolean statusBarIsDark = statusBarStyle.detectDarkMode(resources);
+            boolean navigationBarIsDark = navigationBarStyle.detectDarkMode(resources);
             if (sdk >= 29) {
                 setUpApi29(window, decorView, statusBarStyle, navigationBarStyle,
                         statusBarIsDark, navigationBarIsDark);
@@ -258,7 +260,7 @@ public final class EdgeToEdge {
         }
 
         boolean detectDarkMode(Resources resources) {
-            return darkModeDetector.isDarkMode(resources);
+            return darkModeDetector != null && darkModeDetector.isDarkMode(resources);
         }
 
         /**

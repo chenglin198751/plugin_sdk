@@ -33,21 +33,42 @@ dependencies {
 
 // 不可删除：运行 demo 时自动触发插件编译（对齐 360 sdk_social_pay_demo_online/build.gradle L68）
 // 运行 ./gradlew :demo:assembleDebug 时，自动先编译插件并把插件 APK 复制到 demo assets
-tasks.configureEach {
-    task ->
-        // 一定要这么写，否则会触发编译的递归
-        if (task.name == "assembleDebug" && project.name == "demo") {
-            // 只有真正运行 demo 产出 APK 时才会有值，点击 Sync 则返回空数组 []
-            def runTasks = gradle.startParameter.taskNames
-            if (":demo:assembleDebug" in runTasks) {
-                def isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows()
-                def gradlew = isWindows
-                        ? new File(rootDir, "gradlew.bat").absolutePath
-                        : new File(rootDir, "gradlew").absolutePath
-                project.services.get(ExecOperations).exec {
-                    workingDir rootDir
-                    commandLine gradlew, ":plugin:assembleRelease"
-                }
-            }
-        }
+//
+// 说明：
+// 1. gradle.startParameter.taskNames 返回的是用户原样输入、不做归一化的字符串，
+//    所以带模块前缀（:demo:assembleDebug）和不带前缀（根目录直接跑 assembleDebug）
+//    两种写法都要覆盖；installDebug 也要覆盖，否则开发者用 installDebug 时会静默打进旧补丁。
+// 2. 嵌套构建挂在 preBuild 的 doFirst 上（执行阶段）而不是配置阶段：配置阶段会早于
+//    clean 执行，导致 `gradlew clean :demo:assembleDebug` 中刚构建出的插件 APK 又被 clean 删掉。
+def pluginBuildTriggered = false
+
+tasks.configureEach { task ->
+    if (project.name != "demo") {
+        return
+    }
+    // 一定要这么写，否则会触发编译的递归：
+    // 内层执行的是 :plugin:assembleRelease，命不中这里监听的任务名
+    if (task.name != "preBuild") {
+        return
+    }
+    // 只有真正运行工程产出 apk 时才会有值，点击 Sync Project With Gradle Files 则返回空数组 []
+    def runTasks = gradle.startParameter.taskNames
+    def shouldBuildPlugin = [":demo:assembleDebug", ":demo:installDebug",
+                             "assembleDebug", "installDebug"].any { it in runTasks }
+    if (!shouldBuildPlugin || pluginBuildTriggered) {
+        return
+    }
+    pluginBuildTriggered = true
+
+    task.doFirst {
+        def isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows()
+        def gradlew = isWindows
+                ? new File(rootDir, "gradlew.bat").absolutePath
+                : new File(rootDir, "gradlew").absolutePath
+        // 用 providers.exec（公开 API），不用 project.services.get(ExecOperations)（Gradle 内部 API）
+        project.providers.exec {
+            workingDir rootDir
+            commandLine gradlew, ":plugin:assembleRelease", "--console=plain"
+        }.result.get()
+    }
 }

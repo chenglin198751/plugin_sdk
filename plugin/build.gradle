@@ -14,21 +14,22 @@ android {
         versionName "2.0.0"
     }
 
-    signingConfigs {
-        release {
-            // 复用 debug 签名（与宿主一致），验签「补丁签名 == 宿主签名」才能通过。
-            storeFile file(System.getProperty("user.home") + "/.android/debug.keystore")
-            storePassword "android"
-            keyAlias "androiddebugkey"
-            keyPassword "android"
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            // 复用 AGP 的隐式 debug 签名配置。
+            //
+            // 必须引用 signingConfigs.debug，不能自己写一个名为 release 的 signingConfig
+            // 再手写 ~/.android/debug.keystore 路径，原因有两个：
+            //   1. AGP 只对「名为 debug 的 signingConfig」自动生成默认 keystore，
+            //      自定义配置在干净机器 / CI 上会直接报 Keystore file not found；
+            //   2. debug keystore 的实际位置受 ANDROID_USER_HOME / ANDROID_PREFS_ROOT /
+            //      ANDROID_SDK_HOME 影响，手写 user.home 在设置了这些变量的机器上会
+            //      解析到另一个目录，导致插件与宿主签名不一致 —— 构建成功但运行时验签必然失败。
+            //
+            // 验签要求「补丁签名 == 宿主签名」，宿主 demo 的 debug 包用的也是这份 debug 签名。
+            signingConfig signingConfigs.debug
         }
     }
 
@@ -49,11 +50,22 @@ project.afterEvaluate {
 }
 
 def copyPatchApkToDemo() {
-    def output = "${project.buildDir}/outputs/apk/release/plugin-release.apk"
-    def destDir = "${rootDir}/demo/src/main/assets/"
+    // 用 layout.buildDirectory 而不是已废弃的 project.buildDir（Gradle 10 会移除）
+    def apk = layout.buildDirectory.file("outputs/apk/release/plugin-release.apk").get().asFile
+    if (!apk.isFile()) {
+        // Gradle 的 copy{} 在源文件不存在时会静默跳过并不报错，
+        // 结果是「构建成功但 demo 里带的是上一次的旧补丁」，很难排查，这里显式失败。
+        throw new GradleException(
+                "插件 APK 不存在，无法同步到 demo: ${apk}\n" +
+                        "通常是 AGP 产物命名或路径变化导致（例如改了 applicationId、" +
+                        "构建类型名、archivesBaseName，或去掉了 signingConfig），" +
+                        "请检查 plugin 模块的构建配置。")
+    }
+    def destDir = new File(rootDir, "demo/src/main/assets")
     copy {
-        from output
+        from apk
         into destDir
         rename { "patch.apk" }
     }
+    logger.lifecycle("已同步插件 APK 到 demo/src/main/assets/patch.apk（${apk.length()} 字节）")
 }

@@ -71,10 +71,12 @@ public class MainActivity extends Activity {
     private void refreshStatus() {
         String status;
         if (PluginSdk.isPatchLoaded()) {
-            status = "补丁已加载\n版本: " + PluginSdk.getPatchVersion()
+            String version = PluginSdk.getPatchVersion();
+            status = "补丁已加载\n版本: " + (version == null ? "未知" : version)
                     + "\n路径: " + PluginSdk.getPatchPath();
         } else {
-            status = "补丁未加载\n原因: " + PluginSdk.getLastError();
+            String error = PluginSdk.getLastError();
+            status = "补丁未加载\n原因: " + (error == null ? "无" : error);
         }
         statusText.setText(status);
     }
@@ -96,7 +98,9 @@ public class MainActivity extends Activity {
         try {
             Class<?> entry = Class.forName(PLUGIN_ENTRY);
             Method createView = entry.getMethod("createView", Context.class);
-            View view = (View) createView.invoke(null, getApplicationContext());
+            // 传 Activity 而不是 Application：插件 View 的主题取自这个 Context，
+            // 用 Application 会拿到 application 的主题而不是当前页面的主题。
+            View view = (View) createView.invoke(null, this);
             patchContainer.removeAllViews();
             patchContainer.addView(view);
         } catch (Throwable t) {

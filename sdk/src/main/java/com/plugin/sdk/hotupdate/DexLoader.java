@@ -2,6 +2,8 @@ package com.plugin.sdk.hotupdate;
 
 import android.content.Context;
 
+import com.plugin.sdk.utils.AppLogUtils;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -17,8 +19,9 @@ import java.lang.reflect.Field;
  * 把补丁的 dexElements 排到数组最前面，再写回宿主的 ClassLoader。
  * 之后宿主进程内 new / Class.forName 都会优先命中补丁里的类。
  * <p>
- * 注意：Android 14（API 34）起，动态代码加载要求 DEX/JAR/APK 文件必须 read-only，
- * 否则抛 {@code SecurityException: Writable dex file ... is not allowed}。
+ * 注意：targetSdk 34 及以上时，在 Android 14（API 34）及以上的设备上，动态代码加载
+ * 要求 DEX/JAR/APK 文件必须 read-only，否则抛
+ * {@code SecurityException: Writable dex file ... is not allowed}。
  * 因此在加载前必须对补丁文件 {@link File#setReadOnly()}。
  * <p>
  * 适用范围：类级别热更（新增类 / 替换「尚未被加载过」的类）。重启生效即可，
@@ -26,10 +29,13 @@ import java.lang.reflect.Field;
  */
 public final class DexLoader {
 
+    private static final String TAG = "DexLoader";
+
     private DexLoader() {
     }
 
     public static void load(Context context, String patchApkPath) throws Exception {
+        AppLogUtils.i(TAG, "开始加载补丁 dex: " + patchApkPath);
         Context app = context.getApplicationContext();
         ClassLoader hostLoader = app.getClassLoader();
 
@@ -56,32 +62,56 @@ public final class DexLoader {
 
         Object hostElements = getDexElements(hostLoader);
         Object patchElements = getDexElements(patchLoader);
+        int patchCount = Array.getLength(patchElements);
+        int hostCount = Array.getLength(hostElements);
+        AppLogUtils.i(TAG, "dexElements 数量: 补丁=" + patchCount + ", 宿主=" + hostCount);
+        if (patchCount == 0) {
+            // DexPathList 对单个 dex 的 IOException 只记录到 dexElementsSuppressedExceptions
+            // 后继续构造，不会抛出。不在这里拦截的话，会得到一个"合并成功但补丁类完全不存在"
+            // 的假成功，真正的失败要等到反射调用 PluginEntry 时才以 ClassNotFoundException 出现。
+            throw new IOException("补丁未贡献任何 dexElements，补丁可能损坏: " + patchApkPath);
+        }
         Object merged = mergeArray(patchElements, hostElements);
         setDexElements(hostLoader, merged);
+        AppLogUtils.i(TAG, "dexElements 合并完成，补丁元素已排到宿主前面");
     }
 
     private static Object getDexElements(ClassLoader loader) throws Exception {
-        Class<?> baseDexClassLoader = Class.forName("dalvik.system.BaseDexClassLoader");
-        Field pathListField = baseDexClassLoader.getDeclaredField("pathList");
-        pathListField.setAccessible(true);
-        Object pathList = pathListField.get(loader);
-
+        Object pathList = getPathList(loader);
         Class<?> dexPathList = Class.forName("dalvik.system.DexPathList");
-        Field dexElementsField = dexPathList.getDeclaredField("dexElements");
-        dexElementsField.setAccessible(true);
-        return dexElementsField.get(pathList);
+        try {
+            Field dexElementsField = dexPathList.getDeclaredField("dexElements");
+            dexElementsField.setAccessible(true);
+            return dexElementsField.get(pathList);
+        } catch (NoSuchFieldException e) {
+            throw new NoSuchFieldException(
+                    "DexPathList.dexElements 不存在，当前系统可能改了内部实现: " + e.getMessage());
+        }
     }
 
     private static void setDexElements(ClassLoader loader, Object dexElements) throws Exception {
-        Class<?> baseDexClassLoader = Class.forName("dalvik.system.BaseDexClassLoader");
-        Field pathListField = baseDexClassLoader.getDeclaredField("pathList");
-        pathListField.setAccessible(true);
-        Object pathList = pathListField.get(loader);
-
+        Object pathList = getPathList(loader);
         Class<?> dexPathList = Class.forName("dalvik.system.DexPathList");
-        Field dexElementsField = dexPathList.getDeclaredField("dexElements");
-        dexElementsField.setAccessible(true);
-        dexElementsField.set(pathList, dexElements);
+        try {
+            Field dexElementsField = dexPathList.getDeclaredField("dexElements");
+            dexElementsField.setAccessible(true);
+            dexElementsField.set(pathList, dexElements);
+        } catch (NoSuchFieldException e) {
+            throw new NoSuchFieldException(
+                    "DexPathList.dexElements 不存在，当前系统可能改了内部实现: " + e.getMessage());
+        }
+    }
+
+    private static Object getPathList(ClassLoader loader) throws Exception {
+        Class<?> baseDexClassLoader = Class.forName("dalvik.system.BaseDexClassLoader");
+        try {
+            Field pathListField = baseDexClassLoader.getDeclaredField("pathList");
+            pathListField.setAccessible(true);
+            return pathListField.get(loader);
+        } catch (NoSuchFieldException e) {
+            throw new NoSuchFieldException(
+                    "BaseDexClassLoader.pathList 不存在，当前系统可能改了内部实现: " + e.getMessage());
+        }
     }
 
     /** 把 patch 数组排在 host 数组前面，返回新的数组。 */

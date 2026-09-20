@@ -18,6 +18,9 @@ public final class HotUpdateEngine {
 
     private static final String TAG = "HotUpdateEngine";
 
+    /** 补丁入口类名，宿主通过反射调用，插件侧无需依赖 SDK。 */
+    private static final String PLUGIN_ENTRY_CLASS = "com.plugin.sdk.plugin.PluginEntry";
+
     private static volatile HotUpdateEngine instance;
 
     private final Context appContext;
@@ -34,8 +37,12 @@ public final class HotUpdateEngine {
         if (instance == null) {
             synchronized (HotUpdateEngine.class) {
                 if (instance == null) {
-                    instance = new HotUpdateEngine(context);
-                    instance.load();
+                    // 先把 load() 跑完，再发布到 volatile 字段。
+                    // 若先赋值再 load()，其他线程会拿到一个 patchLoaded 仍为 false 的
+                    // 半初始化实例，导致 isPatchLoaded() / startPluginActivity() 误判。
+                    HotUpdateEngine engine = new HotUpdateEngine(context);
+                    engine.load();
+                    instance = engine;
                 }
             }
         }
@@ -80,7 +87,7 @@ public final class HotUpdateEngine {
             DexLoader.load(appContext, path);
             AppLogUtils.i(TAG, "dex 加载成功");
 
-            // 3. 初始化补丁资源（--shared-lib 需要调用 R.onResourcesLoaded）
+            // 3. 初始化补丁资源
             initPluginResources(path);
             AppLogUtils.i(TAG, "补丁资源初始化成功");
 
@@ -95,24 +102,24 @@ public final class HotUpdateEngine {
         }
     }
 
-    /** 初始化补丁资源（反射调用补丁的 PluginEntry.initResources，内部会 R.onResourcesLoaded）。 */
+    /** 初始化补丁资源（反射调用补丁的 PluginEntry.initResources）。 */
     private void initPluginResources(String path) throws Exception {
-        Class<?> entry = Class.forName("com.plugin.sdk.plugin.PluginEntry");
+        Class<?> entry = Class.forName(PLUGIN_ENTRY_CLASS, true, appContext.getClassLoader());
         Method m = entry.getMethod("initResources", Context.class, String.class);
         m.invoke(null, appContext, path);
     }
 
-    /** 补丁 dex 加载后，反射读取补丁版本号。 */
+    /** 补丁 dex 加载后，反射读取补丁版本号；读不到返回 null。 */
     private String readPatchVersion() {
         try {
-            Class<?> entry = Class.forName("com.plugin.sdk.plugin.PluginEntry");
+            Class<?> entry = Class.forName(PLUGIN_ENTRY_CLASS, true, appContext.getClassLoader());
             Method m = entry.getMethod("getVersion");
             String v = (String) m.invoke(null);
             AppLogUtils.i(TAG, "readPatchVersion = " + v);
             return v;
         } catch (Throwable t) {
             AppLogUtils.w(TAG, "读取补丁版本失败: " + t);
-            return "未知";
+            return null;
         }
     }
 
