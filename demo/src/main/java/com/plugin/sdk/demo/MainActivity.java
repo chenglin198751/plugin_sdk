@@ -41,6 +41,7 @@ public class MainActivity extends Activity {
         statusText = findViewById(R.id.tv_plugin_status);
         pluginContainer = findViewById(R.id.container_plugin);
 
+        // 按钮 1：从 sdcard 导入插件（真热更路径，导入后重启 App 生效）
         Button importButton = findViewById(R.id.btn_import_plugin);
         importButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,6 +50,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        // 按钮 2：加载插件 View（验证 dex + 资源加载链路，把插件根 View 嵌入宿主页面）
         Button loadViewButton = findViewById(R.id.btn_load_plugin_view);
         loadViewButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +59,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        // 按钮 3：启动插件 Activity（验证插件独立 Activity，通过宿主占位 Activity 代理启动）
         Button startActivityButton = findViewById(R.id.btn_start_plugin_activity);
         startActivityButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,6 +69,7 @@ public class MainActivity extends Activity {
         });
 
         refreshStatus();
+
         // 插件异步加载（后台线程），启动后稍作延时再刷新一次，加载完成即显示状态。
         new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
