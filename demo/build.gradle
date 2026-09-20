@@ -6,6 +6,9 @@ android {
     namespace 'com.plugin.sdk.demo'
     compileSdk 37
 
+    // demo 源码是纯 Java，禁用 AGP 9 的 built-in Kotlin。
+    enableKotlin = false
+
     defaultConfig {
         applicationId "com.plugin.sdk.demo"
         minSdk 21

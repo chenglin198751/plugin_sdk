@@ -6,6 +6,11 @@ android {
     namespace 'com.plugin.sdk.plugin'
     compileSdk 37
 
+    // 插件源码是纯 Java，禁用 AGP 9 的 built-in Kotlin：
+    // 不关的话 AGP 会自动注入 kotlin-stdlib（约 2MB、上万个方法）进补丁 APK，
+    // 既徒增补丁体积，又会因为 DexLoader 把补丁 dex 排在宿主前面而遮住宿主自己的 Kotlin 运行时。
+    enableKotlin = false
+
     defaultConfig {
         applicationId "com.plugin.sdk.plugin"
         minSdk 21

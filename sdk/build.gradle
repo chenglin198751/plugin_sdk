@@ -6,6 +6,10 @@ android {
     namespace 'com.plugin.sdk'
     compileSdk 37
 
+    // SDK 源码是纯 Java，禁用 AGP 9 的 built-in Kotlin，
+    // 避免 AAR 拖一个 kotlin-stdlib 依赖给所有接入方。
+    enableKotlin = false
+
     defaultConfig {
         minSdk 21
     }
