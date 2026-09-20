@@ -22,7 +22,7 @@ public class PluginActivity extends PluginBaseActivity {
 
         TextView version = (TextView) findViewById(R.id.tv_plugin_version);
         if (version != null) {
-            version.setText("插件版本 " + PluginEntry.getVersion());
+            version.setText("插件版本 " + PluginEntry.PLUGIN_VERSION_NAME);
         }
     }
 }

@@ -7,7 +7,10 @@ import android.os.Looper;
 import com.plugin.sdk.PluginSdk;
 import com.plugin.sdk.utils.AppLogUtils;
 
+import java.io.File;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 热更新引擎入口（单例）。
@@ -77,51 +80,101 @@ public final class HotUpdateEngine {
 
     private void load() {
         AppLogUtils.i(TAG, "========== 开始加载插件 ==========");
-        try {
-            String path = PluginRepository.findPlugin(appContext);
-            AppLogUtils.i(TAG, "findPlugin(filesDir) = " + path);
-            if (path == null) {
-                // 快速验收路径：若宿主 assets 里放了 plugin_main.apk，则首次启动自动导入
-                try {
-                    path = PluginRepository.importFromAssets(appContext);
-                    AppLogUtils.i(TAG, "importFromAssets = " + path);
-                } catch (java.io.IOException e) {
-                    AppLogUtils.w(TAG, "importFromAssets 失败: " + e);
-                }
+        List<String> plugins = PluginRepository.findPlugins(appContext);
+        if (plugins.isEmpty()) {
+            // 快速验收路径：若宿主 assets 里放了 plugin_main.apk，则首次启动自动导入
+            try {
+                String imported = PluginRepository.importFromAssets(appContext);
+                AppLogUtils.i(TAG, "importFromAssets = " + imported);
+                plugins = new ArrayList<>();
+                plugins.add(imported);
+            } catch (java.io.IOException e) {
+                AppLogUtils.w(TAG, "importFromAssets 失败: " + e);
             }
-            if (path == null) {
-                lastError = "未找到插件（首次运行或未导入）";
-                AppLogUtils.w(TAG, lastError);
+        }
+        if (plugins.isEmpty()) {
+            lastError = "未找到插件（首次运行或未导入）";
+            AppLogUtils.w(TAG, lastError);
+            return;
+        }
+
+        AppLogUtils.i(TAG, "候选插件版本（从高到低）: " + plugins);
+
+        // 从高版本到低版本逐个尝试，失败降级到次高版本
+        for (String path : plugins) {
+            AppLogUtils.i(TAG, "尝试加载插件: " + path);
+            if (tryLoad(path)) {
+                pluginLoaded = true;
+                pluginPath = path;
+                pluginVersion = readPluginVersion();
+                lastError = null;
+                AppLogUtils.i(TAG, "========== 插件加载完成，版本 = " + pluginVersion + " ==========");
                 return;
             }
-            pluginPath = path;
-            AppLogUtils.i(TAG, "插件路径 = " + path);
+            AppLogUtils.w(TAG, "插件加载失败，降级尝试次高版本: " + path);
+        }
 
-            // 1. 验签
+        pluginLoaded = false;
+        lastError = "所有插件版本均加载失败";
+        AppLogUtils.e(TAG, lastError);
+    }
+
+    /**
+     * 尝试加载单个插件版本，任何一步失败返回 false（供 load 降级到次高版本）。
+     * <p>
+     * 三码校验：文件名 versionCode、APK 元数据 versionCode（getPackageArchiveInfo）、
+     * dex 内常量 versionCode（PluginEntry.getVersionCode）三者必须一致，否则拒绝加载。
+     */
+    private boolean tryLoad(String path) {
+        try {
+            // 1. 加载前校验：文件名 versionCode == APK 元数据 versionCode
+            int fileCode = PluginRepository.parseVersionCode(new File(path).getName());
+            int apkCode = PluginRepository.readVersionCode(appContext, new File(path));
+            if (fileCode <= 0 || apkCode <= 0 || fileCode != apkCode) {
+                AppLogUtils.e(TAG, "版本号不一致（文件名=" + fileCode + ", APK=" + apkCode + "）: " + path);
+                return false;
+            }
+
+            // 2. 验签
             boolean verifyOk = PluginSignatureVerifier.verify(appContext, path);
             AppLogUtils.i(TAG, "验签结果 = " + verifyOk);
             if (!verifyOk) {
-                lastError = "插件签名校验失败";
-                AppLogUtils.e(TAG, lastError);
-                return;
+                AppLogUtils.e(TAG, "插件签名校验失败: " + path);
+                return false;
             }
 
-            // 2. 加载 dex
+            // 3. 加载 dex（不可逆）
             DexLoader.load(appContext, path);
             AppLogUtils.i(TAG, "dex 加载成功");
 
-            // 3. 初始化插件资源
+            // 4. 加载后校验：dex 内常量 versionCode == 文件名 versionCode
+            int dexCode = readPluginVersionCode();
+            if (dexCode <= 0 || dexCode != fileCode) {
+                AppLogUtils.e(TAG, "dex 常量版本不一致（文件名=" + fileCode + ", dex=" + dexCode + "）: " + path);
+                return false;
+            }
+
+            // 5. 初始化插件资源
             initPluginResources(path);
             AppLogUtils.i(TAG, "插件资源初始化成功");
 
-            pluginLoaded = true;
-            pluginVersion = readPluginVersion();
-            lastError = null;
-            AppLogUtils.i(TAG, "========== 插件加载完成，版本 = " + pluginVersion + " ==========");
+            return true;
         } catch (Throwable t) {
-            pluginLoaded = false;
-            lastError = "加载失败: " + t;
-            AppLogUtils.e(TAG, "加载插件异常", t);
+            AppLogUtils.e(TAG, "加载插件失败: " + path, t);
+            return false;
+        }
+    }
+
+    /** 反射读取 dex 内版本常量（三码校验的「dex 常量」一码）。读不到返回 0。 */
+    private int readPluginVersionCode() {
+        try {
+            Class<?> entry = Class.forName(PLUGIN_ENTRY_CLASS, true, appContext.getClassLoader());
+            Method m = entry.getMethod("getVersionCode");
+            Object v = m.invoke(null);
+            return (v instanceof Number) ? ((Number) v).intValue() : 0;
+        } catch (Throwable t) {
+            AppLogUtils.w(TAG, "读取 dex 版本常量失败: " + t);
+            return 0;
         }
     }
 

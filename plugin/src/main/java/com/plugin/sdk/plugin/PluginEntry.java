@@ -15,16 +15,30 @@ import android.view.View;
  */
 public final class PluginEntry {
 
+    /**
+     * 插件版本号（唯一真源）。
+     * <p>
+     * {@code plugin/build.gradle} 的 versionCode / versionName 会从这里解析，保证 APK
+     * 元数据版本与 dex 内常量一致（三码校验的基础）。改插件版本只改这里两个常量即可。
+     */
+    public static final String PLUGIN_VERSION_NAME = "1.0.0";
+    public static final int PLUGIN_VERSION_CODE = 100;
+
     private PluginEntry() {
     }
 
     /**
      * 插件版本号，宿主可用来展示 / 对比是否需要更新。
-     * <p>
-     * 注意与 {@code plugin/build.gradle} 里的 {@code versionName} 保持一致。
      */
     public static String getVersion() {
-        return "2.0.0";
+        return PLUGIN_VERSION_NAME;
+    }
+
+    /**
+     * 插件版本码（整数），宿主用来做三码校验和降级排序。
+     */
+    public static int getVersionCode() {
+        return PLUGIN_VERSION_CODE;
     }
 
     /**

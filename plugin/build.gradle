@@ -15,8 +15,9 @@ android {
         applicationId "com.plugin.sdk.plugin"
         minSdk 21
         targetSdk 37
-        versionCode 1
-        versionName "2.0.0"
+        // 版本号唯一真源在 PluginEntry.java，这里解析出来，保证 APK 元数据版本与 dex 内常量一致
+        versionCode getPluginVersionCode()
+        versionName getPluginVersionName()
     }
 
     buildTypes {
@@ -73,4 +74,30 @@ def copyPatchApkToDemo() {
         rename { "plugin_main.apk" }
     }
     logger.lifecycle("已同步插件 APK 到 demo/src/main/assets/plugin_main.apk（${apk.length()} 字节）")
+}
+
+// 从 PluginEntry.java 解析插件版本号（唯一真源）。改插件版本只需改
+// PluginEntry.PLUGIN_VERSION_NAME / PLUGIN_VERSION_CODE，APK 元数据版本自动跟随。
+int getPluginVersionCode() {
+    def f = file("src/main/java/com/plugin/sdk/plugin/PluginEntry.java")
+    def code = 0
+    f.eachLine { line ->
+        def t = line.trim()
+        if (t.startsWith("public static final int PLUGIN_VERSION_CODE")) {
+            code = Integer.parseInt(t.split('=')[1].replace(';', '').trim())
+        }
+    }
+    return code
+}
+
+String getPluginVersionName() {
+    def f = file("src/main/java/com/plugin/sdk/plugin/PluginEntry.java")
+    def name = ""
+    f.eachLine { line ->
+        def t = line.trim()
+        if (t.startsWith("public static final String PLUGIN_VERSION_NAME")) {
+            name = t.split('=')[1].replace(';', '').trim().replace('"', '')
+        }
+    }
+    return name
 }
