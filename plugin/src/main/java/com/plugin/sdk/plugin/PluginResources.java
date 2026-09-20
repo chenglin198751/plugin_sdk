@@ -48,7 +48,7 @@ public final class PluginResources {
                     hostRes.getConfiguration());
 
             pluginRes = resources;
-            Log.i(TAG, "插件资源验证: layout=" + resources.getResourceName(R.layout.plugin_activity)
+            Log.i(TAG, "插件资源验证: layout=" + resources.getResourceName(R.layout.plugin_test1_activity)
                     + ", background=" + resources.getResourceName(R.drawable.plugin_bg)
                     + ", icon=" + resources.getResourceName(R.drawable.plugin_icon));
             inited = true;

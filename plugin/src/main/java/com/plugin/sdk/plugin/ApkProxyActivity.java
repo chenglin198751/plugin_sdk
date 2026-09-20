@@ -23,6 +23,8 @@ public class ApkProxyActivity implements ApkInterfaceForProxyActivity {
     /** 主页面标识，需与宿主 PluginSdk.DEFAULT_PLUGIN_VIEW_ID 保持一致。 */
     public static final int VIEW_ID_MAIN = 1;
 
+    public static final int VIEW_ID_TEST2 = 2;
+
     /** Intent 里携带的 viewId key，用于区分插件内多个 Activity。 */
     public static final String EXTRA_VIEW_ID = "plugin_view_id";
 
@@ -63,7 +65,9 @@ public class ApkProxyActivity implements ApkInterfaceForProxyActivity {
     private ApkInterfaceForProxyActivity createView(int viewId) {
         switch (viewId) {
             case VIEW_ID_MAIN:
-                return new PluginActivity();
+                return new Test1PluginActivity();
+            case VIEW_ID_TEST2:
+                return new Test2PluginActivity();
             default:
                 return null;
         }

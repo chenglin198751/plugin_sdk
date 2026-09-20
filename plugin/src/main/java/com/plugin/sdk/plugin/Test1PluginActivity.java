@@ -14,11 +14,11 @@ import android.widget.TextView;
  * 其余生命周期方法（含按返回键关闭页面）由 {@link PluginBaseActivity} 提供默认实现，
  * 这里只重写关心的。
  */
-public class PluginActivity extends PluginBaseActivity {
+public class Test1PluginActivity extends PluginBaseActivity {
 
     @Override
     public void onCreate(Activity activity, Bundle savedInstanceState) {
-        setContentView(activity, R.layout.plugin_activity);
+        setContentView(activity, R.layout.plugin_test1_activity);
 
         TextView version = (TextView) findViewById(R.id.tv_plugin_version);
         if (version != null) {

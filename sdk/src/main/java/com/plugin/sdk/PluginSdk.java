@@ -118,7 +118,7 @@ public final class PluginSdk {
      * 占位 Activity 默认开启 edge-to-edge 全屏。
      */
     public static void startPluginActivity(Context context) {
-        startPluginActivity(context, DEFAULT_PLUGIN_VIEW_ID);
+        startPluginActivity(context, 2);
     }
 
     /**

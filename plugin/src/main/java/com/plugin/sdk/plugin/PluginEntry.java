@@ -55,6 +55,6 @@ public final class PluginEntry {
      * 建议传 Activity 而不是 Application，以便插件 View 拿到正确的主题。
      */
     public static View createView(Context context) {
-        return PluginResources.inflate(context, R.layout.plugin_activity);
+        return PluginResources.inflate(context, R.layout.plugin_test1_activity);
     }
 }
