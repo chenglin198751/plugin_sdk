@@ -83,6 +83,10 @@ public class PluginBaseActivity implements ApkInterfaceForProxyActivity {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    }
+
+    @Override
     public void onResume() {
     }
 

@@ -85,6 +85,11 @@ public class ApkProxyActivity implements ApkInterfaceForProxyActivity {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (mCurrentView != null) mCurrentView.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
     public void onResume() {
         if (mCurrentView != null) mCurrentView.onResume();
     }

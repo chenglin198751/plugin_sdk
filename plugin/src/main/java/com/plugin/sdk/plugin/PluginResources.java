@@ -1,10 +1,10 @@
 package com.plugin.sdk.plugin;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -82,14 +82,10 @@ public final class PluginResources {
             Log.w(TAG, "刷新插件资源配置失败，继续沿用旧配置: " + t);
         }
 
-        Resources.Theme theme = resources.newTheme();
-        if (host.getTheme() != null) {
-            // 复制宿主的主题属性。注意 Theme.setTo 跨 Resources 时只复制双方共有的属性，
-            // 也就是 framework 段（0x01xxxxxx）的属性，宿主 App 自定义的属性不会带过来。
-            theme.setTo(host.getTheme());
-        }
-
-        Context patchContext = new PluginContext(host, resources, theme);
+        // Theme 不在这里手动构造，交给 PluginContext（ContextThemeWrapper）懒加载：
+        // 首次 getTheme() 时会用「插件 Resources」newTheme 并 setTo(host 的 theme)，
+        // 既保证 Theme 绑定插件资源表，又跟随当前承载它的 Activity 主题。
+        Context patchContext = new PluginContext(host, resources);
         Log.i(TAG, "inflate layout=" + resources.getResourceName(layoutId));
         return LayoutInflater.from(host)
                 .cloneInContext(patchContext)
@@ -97,22 +93,27 @@ public final class PluginResources {
     }
 
     /**
-     * 插件 XML 专用 Context。
+     * 插件 XML 专用 Context（对齐 360 的 PluginContext）。
      * <p>
-     * 只替换 getResources() / getAssets() 不够：View 构造时会通过 getTheme() 调用
-     * obtainStyledAttributes 解析 background、src、textColor 等属性。若沿用宿主 Theme，
-     * 宿主 Resources 会去解析插件的资源 ID，导致
-     * {@code Resources$NotFoundException: Unable to find resource ID #0x7f...}。
+     * 继承 {@link ContextThemeWrapper} 而不是 {@link ContextWrapper}，原因是：
+     * <ul>
+     *   <li>重写 {@code getResources()} 后，首次 {@code getTheme()} 会用「插件 Resources」
+     *       newTheme 并 setTo(base 的 theme)，让 Theme 绑定插件资源表——否则 View 构造时
+     *       通过 obtainStyledAttributes 解析 background/src/textColor 会去宿主的资源表里
+     *       查插件的资源 ID，抛 {@code Resources$NotFoundException}；</li>
+     *   <li>{@code getSystemService(LAYOUT_INFLATER_SERVICE)} 会自动
+     *       {@code cloneInContext(this)}，让整棵 View 树的 Context 锚定到插件；</li>
+     *   <li>{@code getAssets()} 需要显式重写为插件 AssetManager（ContextThemeWrapper
+     *       默认转发到 base 的 AssetManager，那是宿主的）。</li>
+     * </ul>
      */
-    private static final class PluginContext extends ContextWrapper {
+    private static final class PluginContext extends ContextThemeWrapper {
 
         private final Resources resources;
-        private final Resources.Theme theme;
 
-        PluginContext(Context base, Resources resources, Resources.Theme theme) {
-            super(base);
+        PluginContext(Context base, Resources resources) {
+            super(base, 0);
             this.resources = resources;
-            this.theme = theme;
         }
 
         @Override
@@ -123,16 +124,6 @@ public final class PluginResources {
         @Override
         public AssetManager getAssets() {
             return resources.getAssets();
-        }
-
-        @Override
-        public Resources.Theme getTheme() {
-            return theme;
-        }
-
-        @Override
-        public void setTheme(int resid) {
-            theme.applyStyle(resid, true);
         }
     }
 }

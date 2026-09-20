@@ -33,6 +33,7 @@ public class ApkPluggingActivityProxy implements ApkInterfaceForProxyActivity {
     private Method m_onStart;
     private Method m_onRestart;
     private Method m_onActivityResult;
+    private Method m_onRequestPermissionsResult;
     private Method m_onResume;
     private Method m_onPause;
     private Method m_onStop;
@@ -56,6 +57,7 @@ public class ApkPluggingActivityProxy implements ApkInterfaceForProxyActivity {
         m_onStart = clazz.getMethod("onStart");
         m_onRestart = clazz.getMethod("onRestart");
         m_onActivityResult = clazz.getMethod("onActivityResult", int.class, int.class, Intent.class);
+        m_onRequestPermissionsResult = clazz.getMethod("onRequestPermissionsResult", int.class, String[].class, int[].class);
         m_onResume = clazz.getMethod("onResume");
         m_onPause = clazz.getMethod("onPause");
         m_onStop = clazz.getMethod("onStop");
@@ -106,6 +108,12 @@ public class ApkPluggingActivityProxy implements ApkInterfaceForProxyActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (m_onActivityResult == null) return;
         try { m_onActivityResult.invoke(mProxyObj, requestCode, resultCode, data); } catch (Exception e) { logFailure("onActivityResult", e); }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (m_onRequestPermissionsResult == null) return;
+        try { m_onRequestPermissionsResult.invoke(mProxyObj, requestCode, permissions, grantResults); } catch (Exception e) { logFailure("onRequestPermissionsResult", e); }
     }
 
     @Override

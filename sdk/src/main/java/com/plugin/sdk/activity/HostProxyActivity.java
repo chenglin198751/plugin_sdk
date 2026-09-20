@@ -58,6 +58,12 @@ public class HostProxyActivity extends Activity {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (mActivityProxy != null) mActivityProxy.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
     protected void onResume() {
         if (mActivityProxy != null) mActivityProxy.onResume();
         super.onResume();
