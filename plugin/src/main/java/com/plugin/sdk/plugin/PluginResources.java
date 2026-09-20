@@ -3,6 +3,7 @@ package com.plugin.sdk.plugin;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -11,7 +12,7 @@ import android.view.View;
 import java.lang.reflect.Method;
 
 /**
- * 补丁侧资源管理。
+ * 插件侧资源管理。
  * <p>
  * 插件 APK 用默认 0x7f 编译，加载时用 {@code addAssetPath}（普通加载），构造一个
  * 「只含插件资源的独立 Resources」，通过独立的 Context / Theme 隔离宿主资源
@@ -21,14 +22,14 @@ public final class PluginResources {
 
     private static final String TAG = "PluginResources";
 
-    private static volatile Resources patchRes;
+    private static volatile Resources pluginRes;
     private static volatile boolean inited = false;
 
     private PluginResources() {
     }
 
     /** 初始化插件资源：addAssetPath 加载插件 APK，构造独立 Resources。幂等。 */
-    public static synchronized void init(Context host, String patchApkPath) {
+    public static synchronized void init(Context host, String pluginApkPath) {
         if (inited) {
             return;
         }
@@ -36,25 +37,59 @@ public final class PluginResources {
             AssetManager am = AssetManager.class.newInstance();
             Method addAssetPath = AssetManager.class.getDeclaredMethod("addAssetPath", String.class);
             addAssetPath.setAccessible(true);
-            int cookie = ((Number) addAssetPath.invoke(am, patchApkPath)).intValue();
+            int cookie = ((Number) addAssetPath.invoke(am, pluginApkPath)).intValue();
             if (cookie == 0) {
-                throw new IllegalStateException("addAssetPath 返回 0: " + patchApkPath);
+                throw new IllegalStateException("addAssetPath 返回 0: " + pluginApkPath);
             }
-            Log.i(TAG, "addAssetPath 成功, cookie=" + cookie + ", path=" + patchApkPath);
+            Log.i(TAG, "addAssetPath 成功, cookie=" + cookie + ", path=" + pluginApkPath);
 
             Resources hostRes = host.getResources();
             Resources resources = new Resources(am, hostRes.getDisplayMetrics(),
                     hostRes.getConfiguration());
 
-            patchRes = resources;
+            pluginRes = resources;
             Log.i(TAG, "插件资源验证: layout=" + resources.getResourceName(R.layout.plugin_activity)
                     + ", background=" + resources.getResourceName(R.drawable.plugin_bg)
                     + ", icon=" + resources.getResourceName(R.drawable.plugin_icon));
             inited = true;
         } catch (Throwable t) {
             Log.e(TAG, "初始化插件资源失败", t);
-            throw new RuntimeException("init patch resources failed", t);
+            throw new RuntimeException("init plugin resources failed", t);
         }
+    }
+
+    /**
+     * 取插件资源本体。未初始化时抛异常，避免插件代码在未就绪时拿到 null 继续往下走。
+     */
+    public static Resources getResources() {
+        Resources resources = pluginRes;
+        if (resources == null) {
+            throw new IllegalStateException("PluginResources 未初始化");
+        }
+        return resources;
+    }
+
+    /**
+     * 取插件 drawable。
+     * <p>
+     * 插件页面在代码里动态取资源时，必须走本方法（或下面的 getString/getColor），
+     * 而不是宿主 Context 的 {@code getResources().getDrawable()}——那会拿到宿主的
+     * 资源表，把 0x7f 隔离打穿。
+     */
+    @SuppressWarnings("deprecation")
+    public static Drawable getDrawable(int id) {
+        return getResources().getDrawable(id);
+    }
+
+    /** 取插件字符串。见 {@link #getDrawable(int)} 的说明。 */
+    public static String getString(int id) {
+        return getResources().getString(id);
+    }
+
+    /** 取插件颜色。见 {@link #getDrawable(int)} 的说明。 */
+    @SuppressWarnings("deprecation")
+    public static int getColor(int id) {
+        return getResources().getColor(id);
     }
 
     /**
@@ -70,7 +105,7 @@ public final class PluginResources {
      * （独立 Resources 不在 ResourcesManager 的托管列表里，框架不会自动更新它）。
      */
     public static View inflate(Context host, int layoutId) {
-        Resources resources = patchRes;
+        Resources resources = pluginRes;
         if (resources == null) {
             throw new IllegalStateException("PluginResources 未初始化");
         }
@@ -85,10 +120,10 @@ public final class PluginResources {
         // Theme 不在这里手动构造，交给 PluginContext（ContextThemeWrapper）懒加载：
         // 首次 getTheme() 时会用「插件 Resources」newTheme 并 setTo(host 的 theme)，
         // 既保证 Theme 绑定插件资源表，又跟随当前承载它的 Activity 主题。
-        Context patchContext = new PluginContext(host, resources);
+        Context pluginContext = new PluginContext(host, resources);
         Log.i(TAG, "inflate layout=" + resources.getResourceName(layoutId));
         return LayoutInflater.from(host)
-                .cloneInContext(patchContext)
+                .cloneInContext(pluginContext)
                 .inflate(layoutId, null);
     }
 

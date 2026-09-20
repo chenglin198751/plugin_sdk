@@ -11,10 +11,10 @@ import com.plugin.sdk.utils.AppLogUtils;
 import java.security.MessageDigest;
 
 /**
- * 补丁 APK 签名校验：校验「补丁签名证书 == 宿主自身签名证书」。
+ * 插件 APK 签名校验：校验「插件签名证书 == 宿主自身签名证书」。
  * <p>
- * 采用「补丁与宿主同签名」模型：插件用与宿主相同的签名（gradle 默认 debug 签名）
- * 打包，验签时比对补丁签名和宿主签名是否一致。任何一字节被篡改，签名即失效。
+ * 采用「插件与宿主同签名」模型：插件用与宿主相同的签名（gradle 默认 debug 签名）
+ * 打包，验签时比对插件签名和宿主签名是否一致。任何一字节被篡改，签名即失效。
  * <p>
  * 分版本策略：
  * <ul>
@@ -22,11 +22,11 @@ import java.security.MessageDigest;
  *   <li>API &lt; 28：退化为 V1 签名比对（gradle 默认 V1+V2 双签，低版本走 V1）。</li>
  * </ul>
  */
-public final class PatchSignatureVerifier {
+public final class PluginSignatureVerifier {
 
     private static final String TAG = "SignatureVerifier";
 
-    private PatchSignatureVerifier() {
+    private PluginSignatureVerifier() {
     }
 
     public static boolean verify(Context context, String apkPath) {
@@ -50,33 +50,33 @@ public final class PatchSignatureVerifier {
     private static boolean verifyViaSigningInfo(Context context, String apkPath) throws Exception {
         PackageManager pm = context.getPackageManager();
 
-        PackageInfo patchInfo = pm.getPackageArchiveInfo(
+        PackageInfo pluginInfo = pm.getPackageArchiveInfo(
                 apkPath, PackageManager.GET_SIGNING_CERTIFICATES);
         PackageInfo hostInfo = pm.getPackageInfo(
                 context.getPackageName(), PackageManager.GET_SIGNING_CERTIFICATES);
 
-        AppLogUtils.i(TAG, "patchInfo=" + (patchInfo == null ? "null" : "ok")
-                + ", patchInfo.signingInfo="
-                + (patchInfo != null && patchInfo.signingInfo != null ? "ok" : "null"));
+        AppLogUtils.i(TAG, "pluginInfo=" + (pluginInfo == null ? "null" : "ok")
+                + ", pluginInfo.signingInfo="
+                + (pluginInfo != null && pluginInfo.signingInfo != null ? "ok" : "null"));
         AppLogUtils.i(TAG, "hostPkg=" + context.getPackageName()
                 + ", hostInfo.signingInfo="
                 + (hostInfo != null && hostInfo.signingInfo != null ? "ok" : "null"));
 
-        if (patchInfo == null || patchInfo.signingInfo == null) {
+        if (pluginInfo == null || pluginInfo.signingInfo == null) {
             return false;
         }
         if (hostInfo == null || hostInfo.signingInfo == null) {
             return false;
         }
 
-        Signature[] patchSigners = patchInfo.signingInfo.getApkContentsSigners();
+        Signature[] pluginSigners = pluginInfo.signingInfo.getApkContentsSigners();
         Signature[] hostSigners = hostInfo.signingInfo.getApkContentsSigners();
 
-        AppLogUtils.i(TAG, "patchSigners 数量=" + (patchSigners == null ? 0 : patchSigners.length)
+        AppLogUtils.i(TAG, "pluginSigners 数量=" + (pluginSigners == null ? 0 : pluginSigners.length)
                 + ", hostSigners 数量=" + (hostSigners == null ? 0 : hostSigners.length));
-        if (patchSigners != null) {
-            for (Signature s : patchSigners) {
-                AppLogUtils.i(TAG, "patch 证书 SHA256=" + sha256Hex(s.toByteArray()));
+        if (pluginSigners != null) {
+            for (Signature s : pluginSigners) {
+                AppLogUtils.i(TAG, "plugin 证书 SHA256=" + sha256Hex(s.toByteArray()));
             }
         }
         if (hostSigners != null) {
@@ -85,7 +85,7 @@ public final class PatchSignatureVerifier {
             }
         }
 
-        boolean r = shareSigner(patchSigners, hostSigners);
+        boolean r = shareSigner(pluginSigners, hostSigners);
         AppLogUtils.i(TAG, "shareSigner 结果 = " + r);
         return r;
     }
@@ -94,16 +94,16 @@ public final class PatchSignatureVerifier {
     private static boolean verifyViaV1(Context context, String apkPath) throws Exception {
         PackageManager pm = context.getPackageManager();
 
-        PackageInfo patchInfo = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_SIGNATURES);
+        PackageInfo pluginInfo = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_SIGNATURES);
         PackageInfo hostInfo = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
 
-        AppLogUtils.i(TAG, "patchInfo(V1)=" + (patchInfo == null ? "null" : "ok")
+        AppLogUtils.i(TAG, "pluginInfo(V1)=" + (pluginInfo == null ? "null" : "ok")
                 + ", hostInfo(V1)=" + (hostInfo == null ? "null" : "ok"));
 
-        if (patchInfo == null || hostInfo == null) {
+        if (pluginInfo == null || hostInfo == null) {
             return false;
         }
-        boolean r = shareSigner(patchInfo.signatures, hostInfo.signatures);
+        boolean r = shareSigner(pluginInfo.signatures, hostInfo.signatures);
         AppLogUtils.i(TAG, "shareSigner(V1) 结果 = " + r);
         return r;
     }

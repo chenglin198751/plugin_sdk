@@ -1,7 +1,10 @@
 package com.plugin.sdk.hotupdate;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 
+import com.plugin.sdk.PluginSdk;
 import com.plugin.sdk.utils.AppLogUtils;
 
 import java.lang.reflect.Method;
@@ -9,24 +12,28 @@ import java.lang.reflect.Method;
 /**
  * 热更新引擎入口（单例）。
  * <p>
- * 在宿主 Application.onCreate 里调用 {@link #init(Context)}，完成整条链路：
- * 找补丁 -> 验签 -> 加载 dex -> 加载资源。
+ * 在宿主 Application.onCreate 里调用 {@link #init(Context)}，在<b>后台线程</b>完成整条链路：
+ * 找插件 -> 验签 -> 加载 dex -> 加载资源 -> 读版本。init 立即返回，不阻塞主线程。
  * <p>
- * 设计为「重启生效」：首次运行无补丁，导入补丁后下次启动自动生效。
+ * 加载结果通过 {@link PluginSdk.LoadCallback} 回调（主线程）或 {@link #isPluginLoaded()} 查询。
+ * <p>
+ * 设计为「重启生效」：首次运行无插件，导入插件后下次启动自动生效。
  */
 public final class HotUpdateEngine {
 
     private static final String TAG = "HotUpdateEngine";
 
-    /** 补丁入口类名，宿主通过反射调用，插件侧无需依赖 SDK。 */
+    /** 插件入口类名，宿主通过反射调用，插件侧无需依赖 SDK。 */
     private static final String PLUGIN_ENTRY_CLASS = "com.plugin.sdk.plugin.PluginEntry";
+
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private static volatile HotUpdateEngine instance;
 
     private final Context appContext;
-    private volatile boolean patchLoaded = false;
-    private volatile String patchVersion = null;
-    private volatile String patchPath = null;
+    private volatile boolean pluginLoaded = false;
+    private volatile String pluginVersion = null;
+    private volatile String pluginPath = null;
     private volatile String lastError = null;
 
     private HotUpdateEngine(Context context) {
@@ -34,15 +41,21 @@ public final class HotUpdateEngine {
     }
 
     public static void init(Context context) {
+        init(context, null);
+    }
+
+    /**
+     * 初始化热更新引擎，异步在后台线程完成加载。
+     * <p>
+     * 调用后立即返回；加载完成后通过 {@code callback}（主线程）通知，
+     * 或通过 {@link #isPluginLoaded()} 查询。首次调用才真正发起加载，重复调用无副作用。
+     */
+    public static void init(Context context, PluginSdk.LoadCallback callback) {
         if (instance == null) {
             synchronized (HotUpdateEngine.class) {
                 if (instance == null) {
-                    // 先把 load() 跑完，再发布到 volatile 字段。
-                    // 若先赋值再 load()，其他线程会拿到一个 patchLoaded 仍为 false 的
-                    // 半初始化实例，导致 isPatchLoaded() / startPluginActivity() 误判。
-                    HotUpdateEngine engine = new HotUpdateEngine(context);
-                    engine.load();
-                    instance = engine;
+                    instance = new HotUpdateEngine(context);
+                    instance.startLoad(callback);
                 }
             }
         }
@@ -52,33 +65,43 @@ public final class HotUpdateEngine {
         return instance;
     }
 
+    /** 在后台线程执行加载，完成后把结果切回主线程回调。 */
+    private void startLoad(final PluginSdk.LoadCallback callback) {
+        new Thread(() -> {
+            load();
+            if (callback != null) {
+                mainHandler.post(() -> callback.onLoadFinished(pluginLoaded, pluginVersion, lastError));
+            }
+        }, "PluginSdk-Loader").start();
+    }
+
     private void load() {
-        AppLogUtils.i(TAG, "========== 开始加载补丁 ==========");
+        AppLogUtils.i(TAG, "========== 开始加载插件 ==========");
         try {
-            String path = PatchRepository.findPatch(appContext);
-            AppLogUtils.i(TAG, "findPatch(filesDir) = " + path);
+            String path = PluginRepository.findPlugin(appContext);
+            AppLogUtils.i(TAG, "findPlugin(filesDir) = " + path);
             if (path == null) {
-                // 快速验收路径：若宿主 assets 里放了 patch.apk，则首次启动自动导入
+                // 快速验收路径：若宿主 assets 里放了 plugin_main.apk，则首次启动自动导入
                 try {
-                    path = PatchRepository.importFromAssets(appContext);
+                    path = PluginRepository.importFromAssets(appContext);
                     AppLogUtils.i(TAG, "importFromAssets = " + path);
                 } catch (java.io.IOException e) {
                     AppLogUtils.w(TAG, "importFromAssets 失败: " + e);
                 }
             }
             if (path == null) {
-                lastError = "未找到补丁（首次运行或未导入）";
+                lastError = "未找到插件（首次运行或未导入）";
                 AppLogUtils.w(TAG, lastError);
                 return;
             }
-            patchPath = path;
-            AppLogUtils.i(TAG, "补丁路径 = " + path);
+            pluginPath = path;
+            AppLogUtils.i(TAG, "插件路径 = " + path);
 
             // 1. 验签
-            boolean verifyOk = PatchSignatureVerifier.verify(appContext, path);
+            boolean verifyOk = PluginSignatureVerifier.verify(appContext, path);
             AppLogUtils.i(TAG, "验签结果 = " + verifyOk);
             if (!verifyOk) {
-                lastError = "补丁签名校验失败";
+                lastError = "插件签名校验失败";
                 AppLogUtils.e(TAG, lastError);
                 return;
             }
@@ -87,52 +110,52 @@ public final class HotUpdateEngine {
             DexLoader.load(appContext, path);
             AppLogUtils.i(TAG, "dex 加载成功");
 
-            // 3. 初始化补丁资源
+            // 3. 初始化插件资源
             initPluginResources(path);
-            AppLogUtils.i(TAG, "补丁资源初始化成功");
+            AppLogUtils.i(TAG, "插件资源初始化成功");
 
-            patchLoaded = true;
-            patchVersion = readPatchVersion();
+            pluginLoaded = true;
+            pluginVersion = readPluginVersion();
             lastError = null;
-            AppLogUtils.i(TAG, "========== 补丁加载完成，版本 = " + patchVersion + " ==========");
+            AppLogUtils.i(TAG, "========== 插件加载完成，版本 = " + pluginVersion + " ==========");
         } catch (Throwable t) {
-            patchLoaded = false;
+            pluginLoaded = false;
             lastError = "加载失败: " + t;
-            AppLogUtils.e(TAG, "加载补丁异常", t);
+            AppLogUtils.e(TAG, "加载插件异常", t);
         }
     }
 
-    /** 初始化补丁资源（反射调用补丁的 PluginEntry.initResources）。 */
+    /** 初始化插件资源（反射调用插件的 PluginEntry.initResources）。 */
     private void initPluginResources(String path) throws Exception {
         Class<?> entry = Class.forName(PLUGIN_ENTRY_CLASS, true, appContext.getClassLoader());
         Method m = entry.getMethod("initResources", Context.class, String.class);
         m.invoke(null, appContext, path);
     }
 
-    /** 补丁 dex 加载后，反射读取补丁版本号；读不到返回 null。 */
-    private String readPatchVersion() {
+    /** 插件 dex 加载后，反射读取插件版本号；读不到返回 null。 */
+    private String readPluginVersion() {
         try {
             Class<?> entry = Class.forName(PLUGIN_ENTRY_CLASS, true, appContext.getClassLoader());
             Method m = entry.getMethod("getVersion");
             String v = (String) m.invoke(null);
-            AppLogUtils.i(TAG, "readPatchVersion = " + v);
+            AppLogUtils.i(TAG, "readPluginVersion = " + v);
             return v;
         } catch (Throwable t) {
-            AppLogUtils.w(TAG, "读取补丁版本失败: " + t);
+            AppLogUtils.w(TAG, "读取插件版本失败: " + t);
             return null;
         }
     }
 
-    public boolean isPatchLoaded() {
-        return patchLoaded;
+    public boolean isPluginLoaded() {
+        return pluginLoaded;
     }
 
-    public String getPatchVersion() {
-        return patchVersion;
+    public String getPluginVersion() {
+        return pluginVersion;
     }
 
-    public String getPatchPath() {
-        return patchPath;
+    public String getPluginPath() {
+        return pluginPath;
     }
 
     public String getLastError() {

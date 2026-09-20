@@ -70,7 +70,7 @@ def copyPatchApkToDemo() {
     copy {
         from apk
         into destDir
-        rename { "patch.apk" }
+        rename { "plugin_main.apk" }
     }
-    logger.lifecycle("已同步插件 APK 到 demo/src/main/assets/patch.apk（${apk.length()} 字节）")
+    logger.lifecycle("已同步插件 APK 到 demo/src/main/assets/plugin_main.apk（${apk.length()} 字节）")
 }

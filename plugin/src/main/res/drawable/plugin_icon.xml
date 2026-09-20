@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 补丁里的"图片"资源：用一个 vector 模拟本地图，验证本地图资源热更新 -->
+<!-- 插件里的"图片"资源：用一个 vector 模拟本地图，验证本地图资源热更新 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="72dp"
     android:height="72dp"

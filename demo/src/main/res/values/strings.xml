@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">PluginSdk Demo</string>
     <string name="demo_title">Demo App（PluginSdk 接入方）</string>
-    <string name="btn_import_patch">从 sdcard 导入补丁</string>
-    <string name="btn_load_patch_view">加载补丁 View（dex+资源）</string>
-    <string name="btn_start_patch_activity">启动补丁 Activity</string>
+    <string name="btn_import_plugin">从 sdcard 导入插件</string>
+    <string name="btn_load_plugin_view">加载插件 View（dex+资源）</string>
+    <string name="btn_start_plugin_activity">启动插件 Activity</string>
 </resources>

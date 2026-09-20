@@ -22,7 +22,7 @@
         android:textSize="20sp" />
 
     <TextView
-        android:id="@+id/tv_patch_status"
+        android:id="@+id/tv_plugin_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="16dp"
@@ -31,29 +31,29 @@
         android:textSize="14sp" />
 
     <Button
-        android:id="@+id/btn_import_patch"
+        android:id="@+id/btn_import_plugin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/btn_import_patch" />
+        android:text="@string/btn_import_plugin" />
 
     <Button
-        android:id="@+id/btn_load_patch_view"
+        android:id="@+id/btn_load_plugin_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/btn_load_patch_view" />
+        android:text="@string/btn_load_plugin_view" />
 
     <Button
-        android:id="@+id/btn_start_patch_activity"
+        android:id="@+id/btn_start_plugin_activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/btn_start_patch_activity" />
+        android:text="@string/btn_start_plugin_activity" />
 
-    <!-- 插件 View 的容器：加载补丁 View 成功后把插件根 View 加进来 -->
+    <!-- 插件 View 的容器：加载插件 View 成功后把插件根 View 加进来 -->
     <FrameLayout
-        android:id="@+id/container_patch"
+        android:id="@+id/container_plugin"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"

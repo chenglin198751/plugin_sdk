@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="plugin_title">这是热更新补丁的 UI</string>
-    <string name="plugin_version_placeholder">补丁版本未知</string>
-    <string name="plugin_hint">本页面由补丁 APK 的 dex + 资源渲染，证明资源热更新链路已打通</string>
-    <string name="plugin_logo_desc">补丁图标</string>
+    <string name="plugin_title">这是热更新插件的 UI</string>
+    <string name="plugin_version_placeholder">插件版本未知</string>
+    <string name="plugin_hint">本页面由插件 APK 的 dex + 资源渲染，证明资源热更新链路已打通</string>
+    <string name="plugin_logo_desc">插件图标</string>
 </resources>

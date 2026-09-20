@@ -23,7 +23,7 @@ Android 插件化热更新 SDK。对接入方只接入一次 AAR，后续通过�
 ```text
 编译 plugin（:plugin:assembleRelease）
         ↓
-复制 plugin-release.apk → demo/src/main/assets/patch.apk
+复制 plugin-release.apk → demo/src/main/assets/plugin_main.apk
         ↓
 编译 demo
 ```

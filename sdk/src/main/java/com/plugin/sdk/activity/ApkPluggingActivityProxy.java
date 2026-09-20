@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 /**
  * 宿主侧 Activity 代理（对齐 360 的 ApkPluggingActivityProxy）。
  * <p>
- * 通过反射加载插件里的 {@code com.plugin.sdk.plugin.ApkProxyActivity}（补丁 dex 已合并进
+ * 通过反射加载插件里的 {@code com.plugin.sdk.plugin.ApkProxyActivity}（插件 dex 已合并进
  * 宿主 ClassLoader），并把宿主占位 Activity 的生命周期反射转发给它。
  * <p>
  * 本类不与插件共享类型，契约是「方法名 + 参数签名」，因此插件可以完全不依赖 SDK 独立编译。

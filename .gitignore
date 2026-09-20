@@ -22,7 +22,7 @@ local.properties
 
 # 补丁 APK 由 :plugin:assembleRelease 自动生成并同步到 demo assets，
 # 属于构建产物（每次构建的签名字节都不同），不入库。
-/demo/src/main/assets/patch.apk
+/demo/src/main/assets/plugin_main.apk
 
 # 签名文件
 *.jks
